@@ -22,10 +22,10 @@ export function useBubbles(gameWidth, gameHeight) {
       color: '#ff7e67',
       velocityX: velocityX || (Math.random() > 0.5 ? speed : -speed),
       velocityY: -speed * 3.5, // Increased initial upward velocity
-      gravity: 0.05, // Reduced gravity for longer float time
+      gravity: 0.02, // Reduced gravity for longer float time
       size,
       points: bubbleSize.points,
-      minBounceVelocity: speed * 0.8 // Minimum bounce velocity to ensure bubbles always bounce
+      minBounceVelocity: speed * 1.2 // Minimum bounce velocity to ensure bubbles always bounce
     };
   };
   
@@ -79,13 +79,13 @@ export function useBubbles(gameWidth, gameHeight) {
       if (bubble.y + bubble.radius > gameHeight) {
         bubble.y = gameHeight - bubble.radius;
         // Ensure the bubble always bounces with at least the minimum velocity
-        bubble.velocityY = -Math.max(Math.abs(bubble.velocityY) * 0.8, bubble.minBounceVelocity);
+        bubble.velocityY = -Math.max(Math.abs(bubble.velocityY) * 1, bubble.minBounceVelocity);
       }
       
       // Bounce off ceiling
       if (bubble.y - bubble.radius < 0) {
         bubble.y = bubble.radius;
-        bubble.velocityY = Math.max(Math.abs(bubble.velocityY) * 0.8, bubble.minBounceVelocity); // Ensure minimum bounce
+        bubble.velocityY = Math.max(Math.abs(bubble.velocityY) * 1, bubble.minBounceVelocity); // Ensure minimum bounce
       }
     });
   };

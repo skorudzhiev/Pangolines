@@ -99,6 +99,7 @@ const updateGame = () => {
   
   // Check game over condition
   if (gameOver.value) {
+    console.log('Game over detected:', gameOver.value);
     gameRunning.value = false;
     stopGameLoop();
     // Update high score if necessary
