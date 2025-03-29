@@ -117,17 +117,17 @@ const updateGame = () => {
 // Level configurations
 const levelConfigurations = [
   // Level 1 - Standard start
-  { bubbleCounts: [2, 0, 0], speeds: [1, 0, 0] },
+  { bubbleCounts: [2, 0, 0], speeds: [1, 1, 1] },
   // Level 2 - More bubbles
-  { bubbleCounts: [2, 2, 0], speeds: [1.2, 1.2, 0] },
+  { bubbleCounts: [2, 2, 0], speeds: [1, 1, 1] },
   // Level 3 - All sizes
-  { bubbleCounts: [2, 2, 2], speeds: [1.3, 1.3, 1.3] },
+  { bubbleCounts: [2, 2, 2], speeds: [1, 1, 1] },
   // Level 4 - Faster
-  { bubbleCounts: [3, 2, 1], speeds: [1.5, 1.5, 1.5] },
+  { bubbleCounts: [3, 2, 1], speeds: [1.1, 1.1, 1.1] },
   // Level 5 - Even faster
-  { bubbleCounts: [3, 3, 2], speeds: [1.8, 1.8, 1.8] },
+  { bubbleCounts: [3, 3, 2], speeds: [1.2, 1.2, 1.2] },
   // Level 6 and beyond - Increasing speed
-  { bubbleCounts: [4, 3, 2], speeds: [2, 2, 2] }
+  { bubbleCounts: [4, 3, 2], speeds: [1.3, 1.3, 1.3] }
 ];
 
 // Advance to next level
