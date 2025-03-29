@@ -22,6 +22,9 @@ body {
   margin: 0 auto;
   text-align: center;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .title {

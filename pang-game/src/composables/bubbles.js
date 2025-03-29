@@ -2,6 +2,7 @@ import { ref } from 'vue';
 
 export function useBubbles(gameWidth, gameHeight) {
   const bubbles = ref([]);
+  const speedMultipliers = ref([1, 1, 1]);
   
   // Bubble sizes and properties
   const bubbleSizes = [
@@ -12,25 +13,52 @@ export function useBubbles(gameWidth, gameHeight) {
   
   const createBubble = (x, y, size = 0, velocityX = null) => {
     const bubbleSize = bubbleSizes[size];
+    const speed = bubbleSize.speed * speedMultipliers.value[size];
+    
     return {
       x,
       y,
       radius: bubbleSize.radius,
       color: '#ff7e67',
-      velocityX: velocityX || (Math.random() > 0.5 ? bubbleSize.speed : -bubbleSize.speed),
-      velocityY: -bubbleSize.speed * 1.5,
+      velocityX: velocityX || (Math.random() > 0.5 ? speed : -speed),
+      velocityY: -speed * 1.5, // Initial upward velocity
       gravity: 0.1,
       size,
-      points: bubbleSize.points
+      points: bubbleSize.points,
+      minBounceVelocity: speed * 0.8 // Minimum bounce velocity to ensure bubbles always bounce
     };
   };
   
   const resetBubbles = () => {
+    // Reset speed multipliers
+    speedMultipliers.value = [1, 1, 1];
+    
     // Start with 2 large bubbles
     bubbles.value = [
       createBubble(gameWidth / 3, gameHeight - 200, 0),
       createBubble(gameWidth * 2 / 3, gameHeight - 200, 0)
     ];
+  };
+  
+  const initializeLevel = (bubbleCounts, speeds) => {
+    // Update speed multipliers
+    speedMultipliers.value = speeds;
+    
+    // Clear existing bubbles
+    bubbles.value = [];
+    
+    // Create bubbles based on the level configuration
+    for (let size = 0; size < bubbleCounts.length; size++) {
+      const count = bubbleCounts[size];
+      
+      for (let i = 0; i < count; i++) {
+        // Calculate position with good spacing based on the number of bubbles
+        const x = (gameWidth / (count + 1)) * (i + 1);
+        const y = gameHeight - 200 - (size * 50); // Stagger heights based on size
+        
+        bubbles.value.push(createBubble(x, y, size));
+      }
+    }
   };
   
   const updateBubbles = () => {
@@ -50,13 +78,14 @@ export function useBubbles(gameWidth, gameHeight) {
       // Bounce off floor
       if (bubble.y + bubble.radius > gameHeight) {
         bubble.y = gameHeight - bubble.radius;
-        bubble.velocityY = -Math.abs(bubble.velocityY) * 0.8; // Dampen bounce
+        // Ensure the bubble always bounces with at least the minimum velocity
+        bubble.velocityY = -Math.max(Math.abs(bubble.velocityY) * 0.8, bubble.minBounceVelocity);
       }
       
       // Bounce off ceiling
       if (bubble.y - bubble.radius < 0) {
         bubble.y = bubble.radius;
-        bubble.velocityY = Math.abs(bubble.velocityY) * 0.8; // Dampen bounce
+        bubble.velocityY = Math.max(Math.abs(bubble.velocityY) * 0.8, bubble.minBounceVelocity); // Ensure minimum bounce
       }
     });
   };
@@ -102,6 +131,7 @@ export function useBubbles(gameWidth, gameHeight) {
     updateBubbles,
     drawBubbles,
     resetBubbles,
-    splitBubble
+    splitBubble,
+    initializeLevel
   };
 }

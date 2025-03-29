@@ -1,9 +1,23 @@
 <template>
   <div class="game-container" ref="gameContainer" tabindex="0" @keydown="handleKeyDown" @keyup="handleKeyUp">
     <canvas ref="gameCanvas" :width="gameWidth" :height="gameHeight"></canvas>
-    <div v-if="!gameRunning" class="game-start">
+    <div v-if="!gameRunning && !gameOver.value" class="game-start">
       <h1>Pang</h1>
-      <button @click="startGame">Start Game</button>
+      <div class="game-modes">
+        <button @click="startGame(false)">Arcade Mode</button>
+        <button @click="startGame(true)">Classic Mode</button>
+      </div>
+      <div v-if="highScore > 0" class="high-score">High Score: {{ highScore }}</div>
+    </div>
+    <div v-if="gameOver.value" class="game-over">
+      <h1>Game Over</h1>
+      <div class="score-display">Score: {{ score.value }}</div>
+      <div v-if="highScore > 0" class="high-score">High Score: {{ highScore }}</div>
+      <button @click="resetGame">Play Again</button>
+    </div>
+    <div v-if="gameRunning" class="game-ui">
+      <div class="score-display">Score: {{ score.value }}</div>
+      <div v-if="classicMode" class="level-display">Level: {{ currentLevel }}</div>
     </div>
   </div>
 </template>
@@ -17,11 +31,14 @@ import { useProjectiles } from '../composables/projectiles';
 import { useCollisions } from '../composables/collisions';
 
 // Game properties
-const gameWidth = 800;
-const gameHeight = 600;
+const gameWidth = 1024;
+const gameHeight = 768;
 const gameContainer = ref(null);
 const gameCanvas = ref(null);
 const gameRunning = ref(false);
+const classicMode = ref(false);
+const currentLevel = ref(1);
+const highScore = ref(0);
 let ctx = null;
 
 // Game state
@@ -34,9 +51,9 @@ const keysPressed = ref({
 // Initialize game components
 const { startGameLoop, stopGameLoop } = useGameLoop();
 const { player, updatePlayer, drawPlayer, resetPlayer } = usePlayer(gameWidth, gameHeight);
-const { bubbles, updateBubbles, drawBubbles, resetBubbles } = useBubbles(gameWidth, gameHeight);
+const { bubbles, updateBubbles, drawBubbles, resetBubbles, initializeLevel } = useBubbles(gameWidth, gameHeight);
 const { projectiles, updateProjectiles, drawProjectiles, fireProjectile, resetProjectiles } = useProjectiles();
-const { checkCollisions } = useCollisions(player, bubbles, projectiles);
+const { score, gameOver, checkCollisions, resetGameState } = useCollisions(player, bubbles, projectiles);
 
 // Handle keyboard input
 const handleKeyDown = (e) => {
@@ -79,15 +96,80 @@ const updateGame = () => {
   drawBubbles(ctx);
   drawProjectiles(ctx);
   drawPlayer(ctx);
+  
+  // Check game over condition
+  if (gameOver.value) {
+    gameRunning.value = false;
+    stopGameLoop();
+    // Update high score if necessary
+    if (score.value > highScore.value) {
+      highScore.value = score.value;
+      localStorage.setItem('pangHighScore', highScore.value.toString());
+    }
+  }
+  
+  // Check if level is completed (no bubbles left)
+  if (classicMode.value && bubbles.value.length === 0) {
+    advanceToNextLevel();
+  }
+};
+
+// Level configurations
+const levelConfigurations = [
+  // Level 1 - Standard start
+  { bubbleCounts: [2, 0, 0], speeds: [1, 0, 0] },
+  // Level 2 - More bubbles
+  { bubbleCounts: [2, 2, 0], speeds: [1.2, 1.2, 0] },
+  // Level 3 - All sizes
+  { bubbleCounts: [2, 2, 2], speeds: [1.3, 1.3, 1.3] },
+  // Level 4 - Faster
+  { bubbleCounts: [3, 2, 1], speeds: [1.5, 1.5, 1.5] },
+  // Level 5 - Even faster
+  { bubbleCounts: [3, 3, 2], speeds: [1.8, 1.8, 1.8] },
+  // Level 6 and beyond - Increasing speed
+  { bubbleCounts: [4, 3, 2], speeds: [2, 2, 2] }
+];
+
+// Advance to next level
+const advanceToNextLevel = () => {
+  currentLevel.value++;
+  
+  // Get level configuration (use last config for levels beyond defined configs)
+  const levelIndex = Math.min(currentLevel.value - 1, levelConfigurations.length - 1);
+  const levelConfig = levelConfigurations[levelIndex];
+  
+  // Initialize level with configuration
+  initializeLevel(levelConfig.bubbleCounts, levelConfig.speeds);
+};
+
+// Reset game completely
+const resetGame = () => {
+  gameOver.value = false;
+  resetGameState();
+  currentLevel.value = 1;
 };
 
 // Start the game
-const startGame = () => {
+const startGame = (classic = false) => {
   if (gameRunning.value) return;
   
+  // Set game mode
+  classicMode.value = classic;
+  
+  // Reset game components
+  resetGame();
   resetPlayer();
-  resetBubbles();
   resetProjectiles();
+  
+  // Initialize appropriate level
+  if (classic) {
+    // Initialize first level
+    const levelConfig = levelConfigurations[0];
+    initializeLevel(levelConfig.bubbleCounts, levelConfig.speeds);
+  } else {
+    // Arcade mode just uses the default bubble initialization
+    resetBubbles();
+  }
   
   gameRunning.value = true;
   gameContainer.value.focus();
@@ -100,6 +182,12 @@ onMounted(() => {
   if (gameCanvas.value) {
     ctx = gameCanvas.value.getContext('2d');
     gameContainer.value.focus();
+    
+    // Load high score from local storage
+    const savedHighScore = localStorage.getItem('pangHighScore');
+    if (savedHighScore) {
+      highScore.value = parseInt(savedHighScore, 10);
+    }
   }
 });
 
@@ -112,8 +200,8 @@ onUnmounted(() => {
 <style scoped>
 .game-container {
   position: relative;
-  width: 800px;
-  height: 600px;
+  width: 1024px;
+  height: 768px;
   margin: 0 auto;
   background-color: #111;
   overflow: hidden;
@@ -125,7 +213,7 @@ canvas {
   background-color: #000;
 }
 
-.game-start {
+.game-start, .game-over {
   position: absolute;
   top: 0;
   left: 0;
@@ -137,6 +225,36 @@ canvas {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
+}
+
+.game-modes {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.game-ui {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white;
+  font-size: 18px;
+  font-family: sans-serif;
+}
+
+.score-display {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.level-display {
+  font-size: 20px;
+}
+
+.high-score {
+  margin-top: 15px;
+  font-size: 20px;
+  color: #FFD700;
 }
 
 button {

@@ -1,6 +1,6 @@
 # Pang Game
 
-A modern Vue.js reinterpretation of the classic arcade game Pang, featuring core bubble-popping mechanics with a polished single-player experience, responsive controls, and retro-inspired visuals.
+A modern Vue.js reinterpretation of the classic arcade game Pang, featuring core bubble-popping mechanics with a polished single-player experience, responsive controls, retro-inspired visuals, and a level progression system.
 
 ## Features
 
@@ -8,6 +8,24 @@ A modern Vue.js reinterpretation of the classic arcade game Pang, featuring core
 - Vertical projectiles to pop bubbles
 - Realistic bubble physics with bouncing mechanics
 - Classic Pang gameplay where bubbles split into smaller ones when hit
+- Two game modes: Arcade and Classic
+- Classic mode with progressively harder levels
+- High score tracking across sessions
+- Game over when the player is hit by a bubble
+- Enhanced bubble bouncing mechanics ensuring bubbles never fall flat
+
+## Game Modes
+
+### Arcade Mode
+- Single continuous level
+- Default bubble configuration
+- Play until game over
+
+### Classic Mode
+- Progressive levels with increasing difficulty
+- Each level has different bubble configurations and speeds
+- High score tracking
+- Points awarded based on bubble size
 
 ## Controls
 

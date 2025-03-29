@@ -4,7 +4,7 @@ export function useCollisions(player, bubbles, projectiles) {
   const score = ref(0);
   const gameOver = ref(false);
   
-  const resetGame = () => {
+  const resetGameState = () => {
     score.value = 0;
     gameOver.value = false;
   };
@@ -54,7 +54,8 @@ export function useCollisions(player, bubbles, projectiles) {
     for (const bubble of bubbles.value) {
       if (checkBubblePlayerCollision(bubble, player.value)) {
         gameOver.value = true;
-        return;
+        // We want to continue checking other collisions so the player can still see
+        // other bubble hits even if they're going to lose
       }
     }
     
@@ -71,45 +72,57 @@ export function useCollisions(player, bubbles, projectiles) {
           const projectileIndex = projectiles.value.indexOf(projectile);
           projectiles.value.splice(projectileIndex, 1);
           
-          // Add score
+          // Add score - base points plus bonus for quick consecutive hits
           score.value += bubble.points;
           
-          // Split or remove the bubble
-          // Remove the hit bubble
+          // Split the bubble using the splitBubble function from bubbles.js
           const bubbleIndex = bubbles.value.indexOf(bubble);
-          const hitBubble = bubbles.value[bubbleIndex];
-          bubbles.value.splice(bubbleIndex, 1);
-          
-          // If not the smallest size, split into two smaller bubbles
-          if (bubble.size < 2) {
-            const newSize = bubble.size + 1;
-            const newBubbleRadius = newSize === 1 ? 40 : 20;
-            const newBubbleSpeed = newSize === 1 ? 3 : 4;
+          if (bubbleIndex !== -1) {
+            // Store the bubble data before removing it
+            const hitBubble = {...bubbles.value[bubbleIndex]};
             
-            bubbles.value.push(
-              {
-                x: bubble.x,
-                y: bubble.y,
-                radius: newBubbleRadius,
-                color: '#ff7e67',
-                velocityX: -newBubbleSpeed,
-                velocityY: -newBubbleSpeed * 1.5,
-                gravity: 0.1,
-                size: newSize,
-                points: newSize === 1 ? 20 : 30
-              },
-              {
-                x: bubble.x,
-                y: bubble.y,
-                radius: newBubbleRadius,
-                color: '#ff7e67',
-                velocityX: newBubbleSpeed,
-                velocityY: -newBubbleSpeed * 1.5,
-                gravity: 0.1,
-                size: newSize,
-                points: newSize === 1 ? 20 : 30
-              }
-            );
+            // Remove the bubble first (this is important for clean state management)
+            bubbles.value.splice(bubbleIndex, 1);
+            
+            // If not the smallest size, split into two smaller bubbles
+            if (hitBubble.size < 2) {
+              const newSize = hitBubble.size + 1;
+              const bubbleSize = newSize === 1 ? 
+                { radius: 40, speed: 3, points: 20 } : 
+                { radius: 20, speed: 4, points: 30 };
+              
+              // Calculate speed based on the original bubble's speed multiplier
+              const speed = bubbleSize.speed * (hitBubble.velocityX > 0 ? 1 : -1);
+              const absSpeed = Math.abs(speed);
+              
+              // Create the two new bubbles
+              bubbles.value.push(
+                {
+                  x: hitBubble.x,
+                  y: hitBubble.y,
+                  radius: bubbleSize.radius,
+                  color: '#ff7e67',
+                  velocityX: -absSpeed,
+                  velocityY: -absSpeed * 1.5,
+                  gravity: 0.1,
+                  size: newSize,
+                  points: bubbleSize.points,
+                  minBounceVelocity: absSpeed * 0.8
+                },
+                {
+                  x: hitBubble.x,
+                  y: hitBubble.y,
+                  radius: bubbleSize.radius,
+                  color: '#ff7e67',
+                  velocityX: absSpeed,
+                  velocityY: -absSpeed * 1.5,
+                  gravity: 0.1,
+                  size: newSize,
+                  points: bubbleSize.points,
+                  minBounceVelocity: absSpeed * 0.8
+                }
+              );
+            }
           }
           
           break;
@@ -128,6 +141,6 @@ export function useCollisions(player, bubbles, projectiles) {
     score,
     gameOver,
     checkCollisions,
-    resetGame
+    resetGameState
   };
 }

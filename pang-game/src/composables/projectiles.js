@@ -2,15 +2,15 @@ import { ref } from 'vue';
 
 export function useProjectiles() {
   const projectiles = ref([]);
+  const maxProjectiles = ref(1); // Default limit of 1 projectile at a time
   
   const resetProjectiles = () => {
     projectiles.value = [];
   };
   
   const fireProjectile = (x, y) => {
-    // Check if there's already an active projectile
-    // In classic Pang, player can only have one projectile at a time
-    if (projectiles.value.length < 1) {
+    // Check if the player has reached the maximum number of allowed projectiles
+    if (projectiles.value.length < maxProjectiles.value) {
       projectiles.value.push({
         x: x - 2, // Center the projectile
         y,
@@ -66,12 +66,18 @@ export function useProjectiles() {
     }
   };
   
+  // Update max projectiles (can be used for power-ups in future levels)
+  const setMaxProjectiles = (count) => {
+    maxProjectiles.value = count;
+  };
+  
   return {
     projectiles,
     fireProjectile,
     updateProjectiles,
     drawProjectiles,
     removeProjectile,
-    resetProjectiles
+    resetProjectiles,
+    setMaxProjectiles
   };
 }
