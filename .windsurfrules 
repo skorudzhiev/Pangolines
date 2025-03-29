@@ -1,0 +1,12 @@
+I want you to keep an active log file (chatLog.md) that is meant to be read by an LLM that will be kept up to date with every response back from you. 
+Before making any responses you can refer back to this log as needed.
+
+Once you have the full plan, I want you to then make a Task list (tasks.md) of everything we need to brainstorm on to really figure out all the details.
+
+Once we have a full plan and task list, let’s start going through all the items on the task list and provide all the answers and exhaust ideas. 
+As we go through and complete each of the tasks, you need to update a document (Report.md) that records all of the ideas and stuff that we come up with into a full-length documented report.
+
+As you progress through responses, see if you need to ask me any questions first. 
+If you are getting more information from me before answering anything would lead to better results, ask only if you don't have enough info to answer as best as possible.
+
+Longer responses are always better than shorter responses, so if need be, split your responses into smaller chunks that are put together over multiple responses.
