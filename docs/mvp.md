@@ -48,7 +48,7 @@ This project is a modern reinterpretation of the classic arcade game Pang (Buste
 - [X] Implement player movement (horizontal only).
 - [X] Add projectile shooting mechanics.
 - [X] Create bubble physics (bouncing, splitting, growth).
-- [ ] Design scoring system with combo bonuses.
+- [X] Design scoring system with combo bonuses.
 
 ### **Visuals**
 - [ ] Create pixel art assets for player, bubbles, and backgrounds.
@@ -60,8 +60,8 @@ This project is a modern reinterpretation of the classic arcade game Pang (Buste
 - [ ] Implement dynamic background music.
 
 ### **Levels**
-- [ ] Design initial set of levels with increasing difficulty.
-- [ ] Implement level progression system.
+- [X] Design initial set of levels with increasing difficulty.
+- [X] Implement level progression system.
 
 ### **Polish**
 - [ ] Add pause and restart functionality.
