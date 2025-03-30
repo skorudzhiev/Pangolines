@@ -3,6 +3,12 @@ import { ref } from 'vue';
 export function useCollisions(player, bubbles, projectiles) {
   const score = ref(0);
   const gameOver = ref(false);
+  const bubbleHitCallbacks = [];
+  
+  // Register a callback for bubble hits (for combo system)
+  const onBubbleHit = (callback) => {
+    bubbleHitCallbacks.push(callback);
+  };
   
   const resetGameState = () => {
     score.value = 0;
@@ -49,7 +55,7 @@ export function useCollisions(player, bubbles, projectiles) {
     return true;
   };
   
-  const checkCollisions = () => {
+  const checkCollisions = (comboMultiplier = 1) => {
     // Check for collisions between bubbles and player
     for (const bubble of bubbles.value) {
       if (checkBubblePlayerCollision(bubble, player.value)) {
@@ -72,8 +78,24 @@ export function useCollisions(player, bubbles, projectiles) {
           const projectileIndex = projectiles.value.indexOf(projectile);
           projectiles.value.splice(projectileIndex, 1);
           
-          // Add score - base points plus bonus for quick consecutive hits
-          score.value += bubble.points;
+          // Add score - with combo multiplier applied
+          const pointsEarned = Math.round(bubble.points * comboMultiplier);
+          score.value += pointsEarned;
+          
+          // Notify all registered callbacks about the bubble hit
+          bubbleHitCallbacks.forEach(callback => callback());
+          
+          // Add floating score text animation
+          if (window.floatingTexts) {
+            window.floatingTexts.push({
+              x: bubble.x,
+              y: bubble.y,
+              text: `+${pointsEarned}`,
+              color: comboMultiplier > 1 ? '#f87171' : 'white',
+              lifespan: 60,
+              velocity: { x: 0, y: -1 }
+            });
+          }
           
           // Split the bubble using the splitBubble function from bubbles.js
           const bubbleIndex = bubbles.value.indexOf(bubble);
@@ -141,6 +163,7 @@ export function useCollisions(player, bubbles, projectiles) {
     score,
     gameOver,
     checkCollisions,
-    resetGameState
+    resetGameState,
+    onBubbleHit
   };
 }

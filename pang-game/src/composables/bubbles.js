@@ -3,6 +3,7 @@ import { ref } from 'vue';
 export function useBubbles(gameWidth, gameHeight) {
   const bubbles = ref([]);
   const speedMultipliers = ref([1, 1, 1]);
+  const difficultyMultiplier = ref(1);
   
   // Bubble sizes and properties
   const bubbleSizes = [
@@ -73,6 +74,13 @@ export function useBubbles(gameWidth, gameHeight) {
       // Bounce off walls
       if (bubble.x - bubble.radius < 0 || bubble.x + bubble.radius > gameWidth) {
         bubble.velocityX = -bubble.velocityX;
+        
+        // Correct position if out of bounds
+        if (bubble.x - bubble.radius < 0) {
+          bubble.x = bubble.radius;
+        } else if (bubble.x + bubble.radius > gameWidth) {
+          bubble.x = gameWidth - bubble.radius;
+        }
       }
       
       // Bounce off floor
@@ -126,12 +134,40 @@ export function useBubbles(gameWidth, gameHeight) {
     });
   };
   
+  // Add random bubbles based on difficulty
+  const addRandomBubbles = (count = 1, difficulty = 1) => {
+    difficultyMultiplier.value = difficulty;
+    
+    // Calculate adjusted bubble speed based on difficulty
+    for (let i = 0; i < speedMultipliers.value.length; i++) {
+      speedMultipliers.value[i] = 1 + (difficulty - 1) * 0.2; // Gradually increase speed with difficulty
+    }
+    
+    // Add random bubbles
+    for (let i = 0; i < count; i++) {
+      // Randomly decide bubble size, with higher difficulty favoring smaller bubbles
+      let sizeOptions = [0]; // Start with just large bubbles
+      
+      if (difficulty > 2) sizeOptions.push(1); // Add medium bubbles after difficulty 2
+      if (difficulty > 4) sizeOptions.push(2); // Add small bubbles after difficulty 4
+      
+      const size = sizeOptions[Math.floor(Math.random() * sizeOptions.length)];
+      
+      // Place bubble at random position near the top
+      const x = Math.random() * (gameWidth - 200) + 100; // Keep away from edges
+      const y = 100; // Start near the top
+      
+      bubbles.value.push(createBubble(x, y, size));
+    }
+  };
+  
   return {
     bubbles,
     updateBubbles,
     drawBubbles,
     resetBubbles,
     splitBubble,
-    initializeLevel
+    initializeLevel,
+    addRandomBubbles
   };
 }

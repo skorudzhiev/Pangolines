@@ -16,8 +16,15 @@
       <button @click="resetGame">Play Again</button>
     </div>
     <div v-if="gameRunning" class="game-ui">
-      <div class="score-display">Score: {{ score.value }}</div>
+      <div class="score-container">
+        <div class="score-display">Score: {{ score.value }}</div>
+        <div class="combo-display" :class="{ active: comboCounter > 0 }">
+          <span class="combo-counter">{{ comboCounter }}x Combo</span>
+          <span class="combo-multiplier">{{ comboMultiplier.toFixed(1) }}x Multiplier</span>
+        </div>
+      </div>
       <div v-if="classicMode" class="level-display">Level: {{ currentLevel }}</div>
+      <div v-else class="difficulty-display">Difficulty: {{ Math.floor(difficulty * 10) / 10 }}</div>
     </div>
   </div>
 </template>
@@ -39,7 +46,17 @@ const gameRunning = ref(false);
 const classicMode = ref(false);
 const currentLevel = ref(1);
 const highScore = ref(0);
+const comboCounter = ref(0);
+const comboMultiplier = ref(1);
+const comboTimeoutId = ref(null);
 let ctx = null;
+
+// Difficulty scaling
+const difficulty = ref(1);
+
+// Floating text animation for scores
+const floatingTexts = ref([]);
+window.floatingTexts = floatingTexts.value;
 
 // Game state
 const keysPressed = ref({
@@ -51,9 +68,38 @@ const keysPressed = ref({
 // Initialize game components
 const { startGameLoop, stopGameLoop } = useGameLoop();
 const { player, updatePlayer, drawPlayer, resetPlayer } = usePlayer(gameWidth, gameHeight);
-const { bubbles, updateBubbles, drawBubbles, resetBubbles, initializeLevel } = useBubbles(gameWidth, gameHeight);
+const { bubbles, updateBubbles, drawBubbles, resetBubbles, initializeLevel, addRandomBubbles } = useBubbles(gameWidth, gameHeight);
 const { projectiles, updateProjectiles, drawProjectiles, fireProjectile, resetProjectiles } = useProjectiles();
-const { score, gameOver, checkCollisions, resetGameState } = useCollisions(player, bubbles, projectiles);
+const { score, gameOver, checkCollisions, resetGameState, onBubbleHit } = useCollisions(player, bubbles, projectiles);
+
+// Handle combo system
+const resetCombo = () => {
+  comboCounter.value = 0;
+  comboMultiplier.value = 1;
+};
+
+const increaseCombo = () => {
+  // Clear any existing timeout
+  if (comboTimeoutId.value) {
+    clearTimeout(comboTimeoutId.value);
+  }
+  
+  // Increment combo counter
+  comboCounter.value++;
+  
+  // Increase multiplier every 3 hits
+  comboMultiplier.value = 1 + Math.floor(comboCounter.value / 3) * 0.5;
+  
+  // Set timeout to reset combo if no hits for 3 seconds
+  comboTimeoutId.value = setTimeout(() => {
+    resetCombo();
+  }, 3000);
+};
+
+// Listen for bubble hits to increase combo
+onBubbleHit(() => {
+  increaseCombo();
+});
 
 // Handle keyboard input
 const handleKeyDown = (e) => {
@@ -62,6 +108,11 @@ const handleKeyDown = (e) => {
   if (e.code === 'Space') {
     keysPressed.value.Space = true;
     if (gameRunning.value) fireProjectile(player.value.x + player.value.width / 2, player.value.y);
+  }
+  
+  // Prevent scrolling when pressing space or arrow keys
+  if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+    e.preventDefault();
   }
   e.preventDefault();
 };
@@ -90,12 +141,15 @@ const updateGame = () => {
   updateBubbles();
   
   // Check collisions
-  checkCollisions();
+  checkCollisions(comboMultiplier.value);
   
   // Draw everything
   drawBubbles(ctx);
   drawProjectiles(ctx);
   drawPlayer(ctx);
+  
+  // Draw floating score texts
+  drawFloatingTexts(ctx);
   
   // Check game over condition
   if (gameOver.value) {
@@ -109,9 +163,16 @@ const updateGame = () => {
     }
   }
   
-  // Check if level is completed (no bubbles left)
+  // Check if level is completed (no bubbles left) in classic mode
   if (classicMode.value && bubbles.value.length === 0) {
     advanceToNextLevel();
+  }
+  
+  // In arcade mode, add more bubbles if they're running low
+  if (!classicMode.value && bubbles.value.length < 3 && Math.random() < 0.02) {
+    // Increase difficulty over time
+    difficulty.value += 0.05;
+    addRandomBubbles(Math.min(Math.floor(difficulty.value), 3), difficulty.value);
   }
 };
 
@@ -148,6 +209,15 @@ const resetGame = () => {
   gameOver.value = false;
   resetGameState();
   currentLevel.value = 1;
+  resetCombo();
+  floatingTexts.value = [];
+  window.floatingTexts = floatingTexts.value;
+  difficulty.value = 1;
+  
+  // Ensure the game container has focus
+  if (gameContainer.value) {
+    gameContainer.value.focus();
+  }
 };
 
 // Start the game
@@ -178,6 +248,8 @@ const startGame = (classic = false) => {
   startGameLoop(updateGame);
 };
 
+
+
 // Initialize the game
 onMounted(() => {
   if (gameCanvas.value) {
@@ -192,9 +264,46 @@ onMounted(() => {
   }
 });
 
+// Draw floating score texts
+const drawFloatingTexts = (ctx) => {
+  // Update and draw floating texts
+  for (let i = floatingTexts.value.length - 1; i >= 0; i--) {
+    const text = floatingTexts.value[i];
+    
+    // Update position
+    text.x += text.velocity.x;
+    text.y += text.velocity.y;
+    
+    // Update lifespan
+    text.lifespan--;
+    
+    // Remove if expired
+    if (text.lifespan <= 0) {
+      floatingTexts.value.splice(i, 1);
+      continue;
+    }
+    
+    // Calculate opacity based on remaining lifespan
+    const opacity = Math.min(text.lifespan / 30, 1);
+    
+    // Draw text
+    ctx.font = '20px Arial';
+    ctx.fillStyle = text.color || 'white';
+    ctx.globalAlpha = opacity;
+    ctx.textAlign = 'center';
+    ctx.fillText(text.text, text.x, text.y);
+    ctx.globalAlpha = 1;
+  }
+};
+
 // Clean up when component is unmounted
 onUnmounted(() => {
   stopGameLoop();
+  if (comboTimeoutId.value) {
+    clearTimeout(comboTimeoutId.value);
+  }
+  // Clean up global reference
+  window.floatingTexts = null;
 });
 </script>
 
@@ -211,45 +320,97 @@ onUnmounted(() => {
 
 canvas {
   display: block;
-  background-color: #000;
+  background-color: #1f2937;
+}
+
+.game-start, .game-over, .game-ui {
+  position: absolute;
+  color: white;
+  text-align: center;
+  z-index: 10;
 }
 
 .game-start, .game-over {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
 }
 
 .game-modes {
   display: flex;
-  gap: 20px;
+  justify-content: center;
+  gap: 10px;
   margin-top: 20px;
 }
 
-.game-ui {
-  position: absolute;
-  top: 10px;
-  left: 10px;
+button {
+  background-color: #4338ca;
   color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 5px;
   font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #3730a3;
+}
+
+.game-ui {
+  top: 20px;
+  right: 20px;
+  text-align: right;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   font-family: sans-serif;
+  z-index: 100;
 }
 
-.score-display {
-  margin-bottom: 10px;
+.score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.score-display, .level-display, .difficulty-display {
   font-size: 24px;
+  margin: 5px 0;
 }
 
-.level-display {
-  font-size: 20px;
+.combo-display {
+  opacity: 0;
+  transition: opacity 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.combo-display.active {
+  opacity: 1;
+}
+
+.combo-counter {
+  font-size: 18px;
+  color: #fcd34d;
+}
+
+.combo-multiplier {
+  font-size: 16px;
+  color: #f87171;
 }
 
 .high-score {
