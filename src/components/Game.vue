@@ -1,6 +1,8 @@
 <template>
-  <div class="game-container" ref="gameContainer" tabindex="0" @keydown="handleKeyDown" @keyup="handleKeyUp">
-    <canvas ref="gameCanvas" :width="gameWidth" :height="gameHeight"></canvas>
+  <div class="game-container" ref="gameContainer" tabindex="0" @keydown="handleKeyDown" @keyup="handleKeyUp" @resize="handleResize">
+    <div class="canvas-wrapper" ref="canvasWrapper">
+      <canvas ref="gameCanvas" :width="gameWidth" :height="gameHeight"></canvas>
+    </div>
     
     <!-- MAIN MENU (not playing, not game over, not in store) -->
     <div v-if="!gameRunning && !gameOver.value && !showStore" class="game-start">
@@ -43,7 +45,7 @@
       </div>
 
       <!-- Back button to return to main menu -->
-      <button class="back-button" @click="showStore = false">Back</button>
+      <button class="back-button" @click="closeStore">Back to Main Menu</button>
     </div>
 
     <!-- GAME OVER SCREEN -->
@@ -86,10 +88,11 @@ import { useProjectiles } from '../composables/projectiles';
 import { useCollisions } from '../composables/collisions';
 
 // Reactive refs and game states
-const gameWidth = 1024;
-const gameHeight = 768;
+const gameWidth = 1024; // Base game width
+const gameHeight = 768; // Base game height
 const gameContainer = ref(null);
 const gameCanvas = ref(null);
+const canvasWrapper = ref(null);
 const showStore = ref(false); // <-- controls whether the store overlay is shown
 
 const gameRunning = ref(false);
@@ -128,6 +131,11 @@ const purchasePowerUp = (powerUpId) => {
     console.log(`Purchased ${powerUpId}`);
     // If the purchased power-up requires an immediate effect, you can check here or in your game loop.
   }
+};
+
+// Store navigation
+const closeStore = () => {
+  showStore.value = false;
 };
 
 // Combo system
@@ -303,41 +311,118 @@ const drawFloatingTexts = (ctx) => {
   }
 };
 
-// onMounted, onUnmounted
+// Handle canvas scaling
+const updateCanvasScale = () => {
+  if (!gameContainer.value || !canvasWrapper.value) return;
+  
+  const container = gameContainer.value.getBoundingClientRect();
+  
+  // Calculate the scale to fit the game in the container
+  const scaleToFit = Math.min(
+    container.width / gameWidth,
+    container.height / gameHeight
+  ) * 0.95; // 95% of available space to ensure some padding
+  
+  // Calculate the new dimensions
+  const newWidth = gameWidth * scaleToFit;
+  const newHeight = gameHeight * scaleToFit;
+  
+  // Calculate the position to center the game
+  const left = (container.width - newWidth) / 2;
+  const top = (container.height - newHeight) / 2;
+  
+  // Apply the scaling and positioning
+  Object.assign(canvasWrapper.value.style, {
+    transform: `scale(${scaleToFit})`,
+    transformOrigin: 'top left',
+    position: 'absolute',
+    left: `${left}px`,
+    top: `${top}px`,
+    width: `${gameWidth}px`,
+    height: `${gameHeight}px`
+  });
+};
+
+const handleResize = () => {
+  updateCanvasScale();
+  // Ensure the canvas is properly cleared and redrawn on resize
+  if (ctx) {
+    ctx.clearRect(0, 0, gameWidth, gameHeight);
+  }
+};
+
 onMounted(() => {
   if (gameCanvas.value) {
     ctx = gameCanvas.value.getContext('2d');
     gameContainer.value.focus();
     const savedHighScore = localStorage.getItem('pangHighScore');
     if (savedHighScore) {
-      highScore.value = parseInt(savedHighScore, 10);
+      highScore.value = parseInt(savedHighScore);
     }
+    
+    // Initial scale update
+    updateCanvasScale();
+    
+    // Add resize listener with debounce
+    let resizeTimeout;
+    const handleResizeWithDebounce = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(updateCanvasScale, 100);
+    };
+    
+    window.addEventListener('resize', handleResizeWithDebounce);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResizeWithDebounce);
+    };
   }
 });
 
 onUnmounted(() => {
   stopGameLoop();
-  if (comboTimeoutId.value) {
-    clearTimeout(comboTimeoutId.value);
-  }
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
   window.floatingTexts = null;
 });
 </script>
 
 <style scoped>
 .game-container {
-  position: relative;
-  width: 1024px;
-  height: 768px;
-  margin: 0 auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
   background-color: #111;
   overflow: hidden;
   outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.canvas-wrapper {
+  position: relative;
+  width: 1024px;
+  height: 768px;
+  transform-origin: center center;
+  will-change: transform;
+  flex-shrink: 0;
 }
 
 canvas {
   display: block;
   background-color: #1f2937;
+  width: 100%;
+  height: 100%;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 /* Main menu & game over overlays share styling */
@@ -364,7 +449,10 @@ canvas {
   border: 1px solid #444;
   padding: 20px;
   border-radius: 10px;
-  width: 300px;
+  width: 80%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
   color: white;
   text-align: center;
   z-index: 30; /* on top of the main menu */
@@ -380,6 +468,10 @@ canvas {
 .powerups-container {
   margin-top: 20px;
   text-align: left;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  width: 100%;
 }
 
 .powerup-item {
