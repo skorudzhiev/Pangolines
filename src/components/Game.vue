@@ -81,11 +81,12 @@ defineOptions({
 import { ref, onMounted, onUnmounted } from 'vue';
 import store from '../store.js';
 
-import { useGameLoop } from '../composables/gameLoop';
-import { usePlayer } from '../composables/player';
-import { useBubbles } from '../composables/bubbles';
-import { useProjectiles } from '../composables/projectiles';
-import { useCollisions } from '../composables/collisions';
+import { useGameEngine } from '../core/GameEngine';
+import { useGameLoop } from '../core/managers/gameLoop';
+import { usePlayer } from '../core/entities/player';
+import { useBubbles } from '../core/entities/bubbles';
+import { useProjectiles } from '../core/systems/projectiles';
+import { useCollisions } from '../core/systems/collisions';
 
 // Reactive refs and game states
 const gameWidth = 1024; // Base game width
