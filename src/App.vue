@@ -1,5 +1,6 @@
 <script setup>
 import Game from './components/Game.vue'
+import './styles/global.css'
 </script>
 
 <template>
@@ -10,13 +11,6 @@ import Game from './components/Game.vue'
 </template>
 
 <style>
-body {
-  margin: 0;
-  background-color: #121212;
-  color: white;
-  font-family: Arial, sans-serif;
-}
-
 .app {
   max-width: 100%;
   margin: 0 auto;
