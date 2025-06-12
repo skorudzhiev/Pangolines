@@ -43,6 +43,7 @@ defineOptions({
 // Imports
 import { ref, onMounted, onUnmounted } from 'vue';
 import store from '../store.js';
+import { debounce, clamp, saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers';
 
 import MainMenu from './screens/MainMenu.vue';
 import StoreScreen from './screens/StoreScreen.vue';
@@ -184,7 +185,7 @@ const updateGame = () => {
     stopGameLoop();
     if (score.value > highScore.value) {
       highScore.value = score.value;
-      localStorage.setItem('pangHighScore', highScore.value.toString());
+      saveToLocalStorage('pangHighScore', highScore.value);
     }
   }
 
@@ -324,23 +325,12 @@ onMounted(() => {
   if (gameCanvas.value) {
     ctx = gameCanvas.value.getContext('2d');
     gameContainer.value.focus();
-    const savedHighScore = localStorage.getItem('pangHighScore');
-    if (savedHighScore) {
-      highScore.value = parseInt(savedHighScore);
-    }
-    
+    highScore.value = loadFromLocalStorage('pangHighScore', 0);
     // Initial scale update
     updateCanvasScale();
-    
     // Add resize listener with debounce
-    let resizeTimeout;
-    const handleResizeWithDebounce = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(updateCanvasScale, 100);
-    };
-    
+    const handleResizeWithDebounce = debounce(handleResize, 150);
     window.addEventListener('resize', handleResizeWithDebounce);
-    
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResizeWithDebounce);
