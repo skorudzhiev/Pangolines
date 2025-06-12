@@ -4,70 +4,33 @@
       <canvas ref="gameCanvas" :width="gameWidth" :height="gameHeight"></canvas>
     </div>
     
-    <!-- MAIN MENU (not playing, not game over, not in store) -->
-    <div v-if="!gameRunning && !gameOver.value && !showStore" class="game-start">
-      <h1>Pang</h1>
-      <div class="game-modes">
-        <button @click="startGame(false)">Arcade Mode</button>
-        <button @click="startGame(true)">Classic Mode</button>
-        <!-- Store button -->
-        <button @click="showStore = true">Store</button>
-      </div>
-      <div v-if="highScore > 0" class="high-score">
-        High Score: {{ highScore }}
-      </div>
-    </div>
+    <MainMenu v-if="!gameRunning && !gameOver.value && !showStore"
+      :highScore="highScore"
+      @start-game="startGame"
+      @show-store="showStore = true"
+    />
 
-    <!-- POWER-UPS STORE (overlay) -->
-    <div v-if="!gameRunning && !gameOver.value && showStore" class="store-container">
-      <h2>Power-Ups Store</h2>
+    <StoreScreen v-if="!gameRunning && !gameOver.value && showStore"
+      :score="store.score"
+      :powerUps="store.powerUps"
+      @purchase="purchasePowerUp"
+      @close-store="closeStore"
+    />
 
-      <!-- Player's current score from the store -->
-      <div class="score-display">Score: {{ store.score }}</div>
+    <GameOverScreen v-if="gameOver.value"
+      :score="score.value"
+      :highScore="highScore"
+      @play-again="resetGame"
+    />
 
-      <!-- List of power-ups -->
-      <div class="powerups-container">
-        <div 
-          v-for="powerUp in store.powerUps" 
-          :key="powerUp.id" 
-          class="powerup-item"
-        >
-          <h3>{{ powerUp.name }}</h3>
-          <p>{{ powerUp.description }}</p>
-          <p>Cost: {{ powerUp.cost }}</p>
-          <button 
-            @click="purchasePowerUp(powerUp.id)"
-            :disabled="store.score < powerUp.cost || powerUp.isPurchased"
-          >
-            {{ powerUp.isPurchased ? 'Purchased' : 'Buy Now' }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Back button to return to main menu -->
-      <button class="back-button" @click="closeStore">Back to Main Menu</button>
-    </div>
-
-    <!-- GAME OVER SCREEN -->
-    <div v-if="gameOver.value" class="game-over">
-      <h1>Game Over</h1>
-      <div class="score-display">Score: {{ score.value }}</div>
-      <div v-if="highScore > 0" class="high-score">High Score: {{ highScore }}</div>
-      <button @click="resetGame">Play Again</button>
-    </div>
-
-    <!-- IN-GAME UI (when playing) -->
-    <div v-if="gameRunning" class="game-ui">
-      <div class="score-container">
-        <div class="score-display">Score: {{ score.value }}</div>
-        <div class="combo-display" :class="{ active: comboCounter > 0 }">
-          <span class="combo-counter">{{ comboCounter }}x Combo</span>
-          <span class="combo-multiplier">{{ comboMultiplier.toFixed(1) }}x Multiplier</span>
-        </div>
-      </div>
-      <div v-if="classicMode" class="level-display">Level: {{ currentLevel }}</div>
-      <div v-else class="difficulty-display">Difficulty: {{ Math.floor(difficulty * 10) / 10 }}</div>
-    </div>
+    <GameScreen v-if="gameRunning"
+      :score="score.value"
+      :comboCounter="comboCounter"
+      :comboMultiplier="comboMultiplier"
+      :classicMode="classicMode"
+      :currentLevel="currentLevel"
+      :difficulty="difficulty"
+    />
   </div>
 </template>
 
@@ -80,12 +43,19 @@ defineOptions({
 // Imports
 import { ref, onMounted, onUnmounted } from 'vue';
 import store from '../store.js';
+import { debounce, clamp, saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers';
 
-import { useGameLoop } from '../composables/gameLoop';
-import { usePlayer } from '../composables/player';
-import { useBubbles } from '../composables/bubbles';
-import { useProjectiles } from '../composables/projectiles';
-import { useCollisions } from '../composables/collisions';
+import MainMenu from './screens/MainMenu.vue';
+import StoreScreen from './screens/StoreScreen.vue';
+import GameOverScreen from './screens/GameOverScreen.vue';
+import GameScreen from './screens/GameScreen.vue';
+
+import { useGameEngine } from '../core/GameEngine';
+import { useGameLoop } from '../core/managers/gameLoop';
+import { usePlayer } from '../core/entities/player';
+import { useBubbles } from '../core/entities/bubbles';
+import { useProjectiles } from '../core/systems/projectiles';
+import { useCollisions } from '../core/systems/collisions';
 
 // Reactive refs and game states
 const gameWidth = 1024; // Base game width
@@ -215,7 +185,7 @@ const updateGame = () => {
     stopGameLoop();
     if (score.value > highScore.value) {
       highScore.value = score.value;
-      localStorage.setItem('pangHighScore', highScore.value.toString());
+      saveToLocalStorage('pangHighScore', highScore.value);
     }
   }
 
@@ -355,23 +325,12 @@ onMounted(() => {
   if (gameCanvas.value) {
     ctx = gameCanvas.value.getContext('2d');
     gameContainer.value.focus();
-    const savedHighScore = localStorage.getItem('pangHighScore');
-    if (savedHighScore) {
-      highScore.value = parseInt(savedHighScore);
-    }
-    
+    highScore.value = loadFromLocalStorage('pangHighScore', 0);
     // Initial scale update
     updateCanvasScale();
-    
     // Add resize listener with debounce
-    let resizeTimeout;
-    const handleResizeWithDebounce = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(updateCanvasScale, 100);
-    };
-    
+    const handleResizeWithDebounce = debounce(handleResize, 150);
     window.addEventListener('resize', handleResizeWithDebounce);
-    
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResizeWithDebounce);
