@@ -7,16 +7,17 @@
         <h3>{{ powerUp.name }}</h3>
         <p>{{ powerUp.description }}</p>
         <p>Cost: {{ powerUp.cost }}</p>
-        <button @click="$emit('purchase', powerUp.id)" :disabled="score < powerUp.cost || powerUp.isPurchased">
+        <UIButton @click="$emit('purchase', powerUp.id)" :disabled="score < powerUp.cost || powerUp.isPurchased">
           {{ powerUp.isPurchased ? 'Purchased' : 'Buy Now' }}
-        </button>
+        </UIButton>
       </div>
     </div>
-    <button class="back-button" @click="$emit('close-store')">Back to Main Menu</button>
+    <UIButton class="back-button" @click="$emit('close-store')">Back to Main Menu</UIButton>
   </div>
 </template>
 
 <script setup>
+import UIButton from '../ui/UIButton.vue'
 defineProps({ score: Number, powerUps: Array })
 defineEmits(['purchase', 'close-store'])
 </script>

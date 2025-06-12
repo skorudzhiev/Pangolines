@@ -1,7 +1,7 @@
 <template>
   <div class="game-ui">
     <div class="score-container">
-      <div class="score-display">Score: {{ score }}</div>
+      <Score>Score: {{ score }}</Score>
       <div class="combo-display" :class="{ active: comboCounter > 0 }">
         <span class="combo-counter">{{ comboCounter }}x Combo</span>
         <span class="combo-multiplier">{{ comboMultiplier.toFixed(1) }}x Multiplier</span>
@@ -13,6 +13,7 @@
 </template>
 
 <script setup>
+import Score from '../ui/Score.vue'
 defineProps({
   score: Number,
   comboCounter: Number,
