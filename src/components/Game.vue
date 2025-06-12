@@ -1,5 +1,5 @@
 <template>
-  <div class="game-container" ref="gameContainer" tabindex="0" @keydown="handleKeyDown" @keyup="handleKeyUp" @resize="handleResize">
+  <div class="game-container" ref="gameContainer" tabindex="0" @resize="handleResize">
     <div class="canvas-wrapper" ref="canvasWrapper">
       <canvas ref="gameCanvas" :width="gameWidth" :height="gameHeight"></canvas>
     </div>
@@ -42,6 +42,7 @@ defineOptions({
 
 // Imports
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useInput } from '../composables/useInput';
 import store from '../store.js';
 import { debounce, clamp, saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers';
 
@@ -80,12 +81,8 @@ const difficulty = ref(1);
 const floatingTexts = ref([]);
 window.floatingTexts = floatingTexts.value;
 
-// Keyboard state
-const keysPressed = ref({
-  ArrowLeft: false,
-  ArrowRight: false,
-  Space: false
-});
+// Input system
+const { keysPressed } = useInput();
 
 // Initialize game systems
 const { startGameLoop, stopGameLoop } = useGameLoop();
@@ -129,39 +126,31 @@ onBubbleHit(() => {
   increaseCombo();
 });
 
-// Input handlers
-const handleKeyDown = (e) => {
-  if (e.code === 'ArrowLeft') keysPressed.value.ArrowLeft = true;
-  if (e.code === 'ArrowRight') keysPressed.value.ArrowRight = true;
-  if (e.code === 'Space') {
-    keysPressed.value.Space = true;
-    if (gameRunning.value) {
-      fireProjectile(player.value.x + player.value.width / 2, player.value.y);
-    }
-  }
-  
-  // Prevent scrolling
-  if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
-    e.preventDefault();
-  }
-  e.preventDefault();
-};
-
-const handleKeyUp = (e) => {
-  if (e.code === 'ArrowLeft') keysPressed.value.ArrowLeft = false;
-  if (e.code === 'ArrowRight') keysPressed.value.ArrowRight = false;
-  if (e.code === 'Space') keysPressed.value.Space = false;
-  e.preventDefault();
-};
+// Input handling is now managed by useInput composable.
+// To fire projectiles, handle this in the game loop or with inputBuffer in the composable, if needed.
 
 // Core game loop update
+// Firing cooldown (in ms)
+let lastFireTime = 0;
+const fireCooldown = 300; // 300ms between shots
+
 const updateGame = () => {
   if (!gameRunning.value) return;
 
   ctx.clearRect(0, 0, gameWidth, gameHeight);
 
   // Movement
-  updatePlayer(keysPressed.value);
+  updatePlayer({
+    ArrowLeft: keysPressed.ArrowLeft,
+    ArrowRight: keysPressed.ArrowRight,
+    Space: keysPressed.Space
+  });
+
+  // Fire projectile if Space is pressed and cooldown allows
+  if (keysPressed.Space && Date.now() - lastFireTime > fireCooldown) {
+    fireProjectile(player.value.x + player.value.width / 2, player.value.y);
+    lastFireTime = Date.now();
+  }
 
   // Projectiles
   updateProjectiles(gameHeight);
