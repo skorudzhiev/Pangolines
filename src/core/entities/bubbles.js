@@ -113,13 +113,24 @@ export function useBubbles(gameWidth, gameHeight) {
     }
   };
   
-  const drawBubbles = (ctx) => {
+  const drawBubbles = (ctx, debugMode = false) => {
     bubbles.value.forEach(bubble => {
       ctx.beginPath();
       ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
       ctx.fillStyle = bubble.color;
       ctx.fill();
-      
+
+      // Debug: draw hitbox
+      if (debugMode) {
+        ctx.save();
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
       // Add shine effect
       ctx.beginPath();
       ctx.arc(

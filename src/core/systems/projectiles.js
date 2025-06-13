@@ -45,7 +45,7 @@ export function useProjectiles() {
     });
   };
   
-  const drawProjectiles = (ctx) => {
+  const drawProjectiles = (ctx, debugMode = false) => {
     projectiles.value.forEach(projectile => {
       if (projectile.active) {
         ctx.fillStyle = projectile.color;
@@ -55,6 +55,19 @@ export function useProjectiles() {
           projectile.width,
           projectile.height
         );
+        // Debug: draw hitbox
+        if (debugMode) {
+          ctx.save();
+          ctx.strokeStyle = 'green';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(
+            projectile.x,
+            projectile.y,
+            projectile.width,
+            projectile.height
+          );
+          ctx.restore();
+        }
       }
     });
   };

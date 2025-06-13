@@ -84,6 +84,13 @@ window.floatingTexts = floatingTexts.value;
 // Input system
 const { keysPressed } = useInput();
 
+// Debug mode
+const debugMode = ref(false);
+// Toggle debug mode with 'D' key
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'KeyD') debugMode.value = !debugMode.value;
+});
+
 // Initialize game systems
 const { startGameLoop, stopGameLoop } = useGameLoop();
 const { player, updatePlayer, drawPlayer, resetPlayer } = usePlayer(gameWidth, gameHeight);
@@ -162,9 +169,9 @@ const updateGame = () => {
   checkCollisions(comboMultiplier.value);
 
   // Drawing
-  drawBubbles(ctx);
-  drawProjectiles(ctx);
-  drawPlayer(ctx);
+  drawBubbles(ctx, debugMode.value);
+  drawProjectiles(ctx, debugMode.value);
+  drawPlayer(ctx, debugMode.value);
   drawFloatingTexts(ctx);
 
   // Check for game over

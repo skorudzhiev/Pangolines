@@ -12,6 +12,18 @@ A modern Vue 3 reinterpretation of the classic arcade game Pang, featuring polis
 - Power-ups store and upgrade system
 - Modular, maintainable codebase with reusable UI components
 - Responsive design and global styles
+- **Debug Mode:** Visualize collision hitboxes for bubbles, player, and projectiles (see below)
+
+## Debug Mode
+
+You can enable a debug mode during gameplay to visualize collision areas:
+
+- **How to enable:** Press the <kbd>D</kbd> key while playing to toggle debug mode on or off.
+- **What it does:**
+  - Draws red outlines around all bubble hitboxes
+  - Draws blue outlines around the player hitbox (body and head)
+  - Draws green outlines around projectile hitboxes
+- Use this to test and debug collision detection, especially for edge cases or new features.
 
 ## Game Modes
 
