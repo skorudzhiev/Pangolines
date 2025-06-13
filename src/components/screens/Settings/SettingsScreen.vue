@@ -10,6 +10,10 @@
         <span>Sound Effects</span>
         <input type="checkbox" v-model="sfxEnabled" />
       </label>
+      <label>
+        <span>Show Bubble Pop Particles</span>
+        <input type="checkbox" v-model="particlesEnabled" @change="$emit('toggle-particles', particlesEnabled)" />
+      </label>
     </div>
     <div class="settings-group">
       <label>
@@ -30,9 +34,24 @@ import styles from './SettingsScreen.module.css';
 import UIButton from '../../ui/UIButton.vue';
 
 defineEmits(['back'])
+import { onMounted, watch } from 'vue';
 const musicEnabled = ref(true);
 const sfxEnabled = ref(true);
 const controlScheme = ref('classic');
+const particlesEnabled = ref(true);
+
+// Load initial value from localStorage
+onMounted(() => {
+  const stored = localStorage.getItem('pangShowParticles');
+  if (stored !== null) {
+    particlesEnabled.value = stored === 'true';
+  }
+});
+
+// Persist changes to localStorage
+watch(particlesEnabled, (val) => {
+  localStorage.setItem('pangShowParticles', val);
+});
 </script>
 
 <style module>

@@ -37,6 +37,10 @@
       :difficulty="difficulty"
       :class="styles.gameUi"
     />
+    <SettingsScreen v-if="!gameRunning && !gameOver.value && showSettings"
+      @toggle-particles="val => { showParticles.value = val; saveToLocalStorage('pangShowParticles', val); }"
+      @back="showSettings = false"
+    />
     </div>
   </div>
 </template>
@@ -79,6 +83,21 @@ const gameCanvasRef = ref(null);
 
 // Particle system
 const { spawnParticles, updateParticles, drawParticles } = useParticles();
+
+// Settings: show/hide particles
+import { computed } from 'vue';
+const showParticles = ref(loadFromLocalStorage('pangShowParticles', true));
+
+// Keep showParticles in sync with localStorage changes (e.g., from SettingsScreen)
+import { watch } from 'vue';
+window.addEventListener('storage', (event) => {
+  if (event.key === 'pangShowParticles') {
+    showParticles.value = event.newValue === 'true';
+  }
+});
+watch(showParticles, (val) => {
+  saveToLocalStorage('pangShowParticles', val);
+});
 
 // Game engine systems (all-in-one)
 const {
@@ -195,8 +214,10 @@ const startGame = (classic = false) => {
     const ctx = gameCanvasRef.value?.gameCanvas?.getContext('2d');
     if (!ctx) return;
     updateGame(ctx);
-    updateParticles();
-    drawParticles(ctx);
+    if (showParticles.value) {
+      updateParticles();
+      drawParticles(ctx);
+    }
   });
 };
 
@@ -206,8 +227,7 @@ onMounted(() => {
   onBubbleHit((...args) => {
     increaseCombo(...args);
     // Find bubble position for particle spawn
-    // Use last floatingText as proxy for bubble position
-    if (window.floatingTexts && window.floatingTexts.length > 0) {
+    if (showParticles.value && window.floatingTexts && window.floatingTexts.length > 0) {
       const lastText = window.floatingTexts[window.floatingTexts.length - 1];
       spawnParticles({ x: lastText.x, y: lastText.y });
     }
