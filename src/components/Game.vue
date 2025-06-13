@@ -59,6 +59,7 @@ import { useGameLogic } from '../composables/useGameLogic';
 import { useGameEngine } from '../composables/useGameEngine';
 import { debounce, saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers';
 import { useParticles } from '../composables/useParticles';
+import { useComboFloatingText } from '../composables/useComboFloatingText';
 
 // State
 const {
@@ -125,6 +126,9 @@ const {
   onBubbleHit
 } = useGameEngine(gameWidth, gameHeight);
 
+// Combo floating text system
+const { showComboText, drawFloatingTexts } = useComboFloatingText(floatingTexts);
+
 // Game logic
 const {
   resetCombo,
@@ -160,7 +164,7 @@ const {
   drawBubbles,
   drawProjectiles,
   drawPlayer,
-  drawFloatingTexts: () => {}, // Optionally pass if needed
+  drawFloatingTexts,
   stopGameLoop,
   startGameLoop,
   saveToLocalStorage,
@@ -224,12 +228,15 @@ const startGame = (classic = false) => {
 onMounted(() => {
   highScore.value = loadFromLocalStorage('pangHighScore', 0);
   // Register combo logic callback for bubble hits
-  onBubbleHit((...args) => {
-    increaseCombo(...args);
-    // Find bubble position for particle spawn
-    if (showParticles.value && window.floatingTexts && window.floatingTexts.length > 0) {
-      const lastText = window.floatingTexts[window.floatingTexts.length - 1];
-      spawnParticles({ x: lastText.x, y: lastText.y });
+  onBubbleHit((bubble) => {
+    increaseCombo();
+    // Show floating combo multiplier above the popped bubble (non-intrusive, visually pleasing)
+    if (bubble && comboMultiplier.value > 1) {
+      showComboText({ x: bubble.x, y: bubble.y, multiplier: comboMultiplier.value });
+    }
+    // Optionally spawn particles (if enabled)
+    if (showParticles.value && bubble) {
+      spawnParticles({ x: bubble.x, y: bubble.y });
     }
   });
 });
