@@ -86,8 +86,8 @@ export function useCollisions(player, bubbles, projectiles) {
           const pointsEarned = Math.round(bubble.points * comboMultiplier);
           store.score += pointsEarned;
           
-          // Notify all registered callbacks about the bubble hit
-          bubbleHitCallbacks.forEach(callback => callback());
+          // Notify all registered callbacks about the bubble hit (pass bubble for visual feedback)
+          bubbleHitCallbacks.forEach(callback => callback(bubble));
           
           // Add floating score text animation
           if (window.floatingTexts) {
