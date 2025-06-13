@@ -27,7 +27,7 @@ import SettingsScreen from './SettingsScreen.vue';
 import GameModeSelectionScreen from './GameModeSelectionScreen.vue';
 
 defineProps({ highScore: Number })
-defineEmits(['start-game', 'show-store'])
+const emit = defineEmits(['start-game', 'show-store'])
 
 const showSettings = ref(false);
 const showModeScreen = ref(false);
