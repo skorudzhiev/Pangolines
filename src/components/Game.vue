@@ -174,6 +174,7 @@ const resetGame = () => {
 
 const startGame = (classic = false) => {
   if (gameRunning.value) return;
+  gameOver.value = false; // Ensure gameOver is reset before starting
   classicMode.value = classic;
   resetGame();
   resetPlayer();

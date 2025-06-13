@@ -1,0 +1,35 @@
+.settingsScreen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(30, 30, 40, 0.95);
+  padding: 32px 28px;
+  border-radius: 16px;
+  color: #f3f3f3;
+  min-width: 320px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  text-align: center;
+  z-index: 30;
+}
+.settings-group {
+  margin: 18px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+label span {
+  margin-right: 12px;
+}
+select {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #23233a;
+  color: #fff;
+}
+input[type="checkbox"] {
+  accent-color: #5ad5fc;
+  width: 18px;
+  height: 18px;
+}

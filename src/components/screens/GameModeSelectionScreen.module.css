@@ -1,0 +1,53 @@
+.modeScreen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(34, 38, 49, 0.97);
+  padding: 36px 30px;
+  border-radius: 18px;
+  color: #f3f3f3;
+  min-width: 340px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+  text-align: center;
+  z-index: 30;
+}
+.modesList {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin: 26px 0 18px 0;
+}
+.modeCard {
+  background: #23233a;
+  border-radius: 12px;
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+  border: 2px solid transparent;
+  width: 170px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.13);
+  outline: none;
+}
+.modeCard:hover, .modeCard:focus {
+  border: 2px solid #5ad5fc;
+  background: #27304a;
+  box-shadow: 0 4px 18px rgba(90,213,252,0.13);
+}
+.selected {
+  border: 2px solid #5ad5fc;
+  background: #283c4a;
+  transform: scale(1.04);
+  box-shadow: 0 4px 18px rgba(90,213,252,0.17);
+}
+.icon {
+  height: 32px;
+  margin-bottom: 8px;
+}
+
+.icon.arcade {
+  background: url('/assets/icons/arcade.svg') no-repeat center/contain;
+}
+.icon.classic {
+  background: url('/assets/icons/classic.svg') no-repeat center/contain;
+}
