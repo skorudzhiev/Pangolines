@@ -1,5 +1,7 @@
 <template>
   <div class="game-container" ref="gameContainer" tabindex="0" @resize="handleResize">
+    <!-- Power-Up Indicator UI -->
+    <PowerUpIndicator v-if="gameRunning" />
     <div class="canvas-wrapper" ref="canvasWrapper">
       <canvas ref="gameCanvas" :width="gameWidth" :height="gameHeight"></canvas>
     </div>
@@ -18,13 +20,13 @@
     />
 
     <GameOverScreen v-if="gameOver.value"
-      :score="score.value"
+      :score="store.score"
       :highScore="highScore"
       @play-again="resetGame"
     />
 
     <GameScreen v-if="gameRunning"
-      :score="score.value"
+      :score="store.score"
       :comboCounter="comboCounter"
       :comboMultiplier="comboMultiplier"
       :classicMode="classicMode"
@@ -50,6 +52,7 @@ import MainMenu from './screens/MainMenu.vue';
 import StoreScreen from './screens/StoreScreen.vue';
 import GameOverScreen from './screens/GameOverScreen.vue';
 import GameScreen from './screens/GameScreen.vue';
+import PowerUpIndicator from './PowerUpIndicator.vue';
 
 import { useGameEngine } from '../core/GameEngine';
 import { useGameLoop } from '../core/managers/gameLoop';
@@ -96,7 +99,7 @@ const { startGameLoop, stopGameLoop } = useGameLoop();
 const { player, updatePlayer, drawPlayer, resetPlayer } = usePlayer(gameWidth, gameHeight);
 const { bubbles, updateBubbles, drawBubbles, resetBubbles, initializeLevel, addRandomBubbles } = useBubbles(gameWidth, gameHeight);
 const { projectiles, updateProjectiles, drawProjectiles, fireProjectile, resetProjectiles } = useProjectiles();
-const { score, gameOver, checkCollisions, resetGameState, onBubbleHit } = useCollisions(player, bubbles, projectiles);
+const { gameOver, checkCollisions, resetGameState, onBubbleHit } = useCollisions(player, bubbles, projectiles);
 
 // Purchasing logic
 const purchasePowerUp = (powerUpId) => {
@@ -153,6 +156,14 @@ const updateGame = () => {
     Space: keysPressed.Space
   });
 
+  // Debug: Log active power-ups
+  if (process.env.NODE_ENV !== 'production') {
+    const active = store.powerUps.filter(p => p.isPurchased).map(p => p.id);
+    if (active.length > 0) {
+      console.log('[DEBUG] Active Power-Ups:', active.join(', '));
+    }
+  }
+
   // Fire projectile if Space is pressed and cooldown allows
   if (keysPressed.Space && Date.now() - lastFireTime > fireCooldown) {
     fireProjectile(player.value.x + player.value.width / 2, player.value.y);
@@ -179,8 +190,10 @@ const updateGame = () => {
     console.log('Game over detected:', gameOver.value);
     gameRunning.value = false;
     stopGameLoop();
-    if (score.value > highScore.value) {
-      highScore.value = score.value;
+    resetProjectiles();
+    store.resetPowerUps();
+    if (store.score > highScore.value) {
+      highScore.value = store.score;
       saveToLocalStorage('pangHighScore', highScore.value);
     }
   }
@@ -225,8 +238,6 @@ const resetGame = () => {
   window.floatingTexts = floatingTexts.value;
   difficulty.value = 1;
 
-  // If you want to reset power-ups each run:
-  // store.resetPowerUps();
 
   if (gameContainer.value) {
     gameContainer.value.focus();

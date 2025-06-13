@@ -1,7 +1,10 @@
 import { ref } from 'vue';
+import store from '../../store.js';
 
 export function useCollisions(player, bubbles, projectiles) {
-  const score = ref(0);
+  // Use store.score as the single source of truth for score
+  const score = store;
+  // const score = ref(0); // Removed
   const gameOver = ref(false);
   const bubbleHitCallbacks = [];
   
@@ -11,7 +14,7 @@ export function useCollisions(player, bubbles, projectiles) {
   };
   
   const resetGameState = () => {
-    score.value = 0;
+    store.score = 0;
     gameOver.value = false;
   };
   
@@ -73,14 +76,19 @@ export function useCollisions(player, bubbles, projectiles) {
         const bubble = bubbles.value[i];
         
         if (checkBubbleProjectileCollision(bubble, projectile)) {
-          // Remove the projectile
-          projectile.active = false;
+           // Remove the projectile
+           projectile.active = false;
+
+           // Debug: Log if projectile is explosive
+           if (process.env.NODE_ENV !== 'production') {
+             console.log('[DEBUG] Projectile hit bubble. Explosive:', projectile.explosive);
+           }
           const projectileIndex = projectiles.value.indexOf(projectile);
           projectiles.value.splice(projectileIndex, 1);
           
           // Add score - with combo multiplier applied
           const pointsEarned = Math.round(bubble.points * comboMultiplier);
-          score.value += pointsEarned;
+          store.score += pointsEarned;
           
           // Notify all registered callbacks about the bubble hit
           bubbleHitCallbacks.forEach(callback => callback());
@@ -96,7 +104,35 @@ export function useCollisions(player, bubbles, projectiles) {
               velocity: { x: 0, y: -1 }
             });
           }
-          
+
+          // EXPLOSIVE PROJECTILES: If this projectile is explosive, pop nearby bubbles too
+          if (projectile.explosive) {
+            const explosionRadius = 60;
+            // Find all bubbles within explosionRadius of the hit bubble (excluding the one already hit)
+            const toExplode = bubbles.value.filter(b => b !== bubble && Math.hypot(b.x - bubble.x, b.y - bubble.y) < explosionRadius);
+            for (const extraBubble of toExplode) {
+              // Remove extra bubble
+              const idx = bubbles.value.indexOf(extraBubble);
+              if (idx !== -1) {
+                // Award points for each extra bubble
+                const extraPoints = Math.round(extraBubble.points * comboMultiplier);
+                store.score += extraPoints;
+                bubbles.value.splice(idx, 1);
+                // Optional: floating text for each
+                if (window.floatingTexts) {
+                  window.floatingTexts.push({
+                    x: extraBubble.x,
+                    y: extraBubble.y,
+                    text: `+${extraPoints}`,
+                    color: '#fbbf24',
+                    lifespan: 60,
+                    velocity: { x: 0, y: -1 }
+                  });
+                }
+              }
+            }
+          }
+
           // Split the bubble using the splitBubble function from bubbles.js
           const bubbleIndex = bubbles.value.indexOf(bubble);
           if (bubbleIndex !== -1) {
@@ -160,10 +196,11 @@ export function useCollisions(player, bubbles, projectiles) {
   };
   
   return {
-    score,
+    score: store,
     gameOver,
     checkCollisions,
     resetGameState,
     onBubbleHit
   };
+
 }

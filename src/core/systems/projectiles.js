@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import store from '../../store.js';
 
 export function useProjectiles() {
   const projectiles = ref([]);
@@ -9,17 +10,54 @@ export function useProjectiles() {
   };
   
   const fireProjectile = (x, y) => {
-    // Check if the player has reached the maximum number of allowed projectiles
+    // Check power-ups
+    const hasLargerShots = store.powerUps.find(p => p.id === 'largerShots' && p.isPurchased);
+    const hasDoubleProjectiles = store.powerUps.find(p => p.id === 'doubleProjectiles' && p.isPurchased);
+    const hasExplosive = store.powerUps.find(p => p.id === 'explosiveProjectiles' && p.isPurchased);
+    const width = hasLargerShots ? 8 : 4;
+    const isExplosive = !!hasExplosive;
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[DEBUG] fireProjectile:', {
+        largerShots: !!hasLargerShots,
+        doubleProjectiles: !!hasDoubleProjectiles,
+        explosiveProjectiles: !!hasExplosive,
+        width,
+        isExplosive
+      });
+    }
+    // Only allow up to maxProjectiles (default 1)
     if (projectiles.value.length < maxProjectiles.value) {
+      // Main projectile
       projectiles.value.push({
-        x: x - 2, // Center the projectile
+        x: x - width / 2, // Center
         y,
-        width: 4,
-        height: 0, // Height will grow
+        width,
+        height: 0,
         speed: 10,
         color: '#fff',
-        active: true
+        active: true,
+        explosive: isExplosive
       });
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[DEBUG] Projectile created:', projectiles.value[projectiles.value.length - 1]);
+      }
+      // Double shot
+      if (hasDoubleProjectiles) {
+        // Slight horizontal offset for second projectile
+        projectiles.value.push({
+          x: x + 10 - width / 2,
+          y,
+          width,
+          height: 0,
+          speed: 10,
+          color: '#fff',
+          active: true,
+          explosive: isExplosive
+        });
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[DEBUG] Double Projectile created:', projectiles.value[projectiles.value.length - 1]);
+        }
+      }
     }
   };
   
@@ -35,14 +73,11 @@ export function useProjectiles() {
         if (projectile.y <= 0) {
           projectile.y = 0;
           projectile.active = false;
-          
-          // Remove the projectile after a short delay
-          setTimeout(() => {
-            projectiles.value.splice(index, 1);
-          }, 100);
         }
       }
     });
+    // Filter out inactive projectiles
+    projectiles.value = projectiles.value.filter(projectile => projectile.active);
   };
   
   const drawProjectiles = (ctx, debugMode = false) => {
