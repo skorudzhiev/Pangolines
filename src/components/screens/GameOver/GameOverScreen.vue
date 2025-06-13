@@ -9,7 +9,7 @@
 
 <script setup>
 import styles from './GameOverScreen.module.css';
-import UIButton from '../ui/UIButton.vue'
+import UIButton from '../../ui/UIButton.vue'
 defineProps({ score: Number, highScore: Number })
 defineEmits(['play-again'])
 </script>

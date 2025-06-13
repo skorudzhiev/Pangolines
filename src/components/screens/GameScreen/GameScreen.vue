@@ -17,8 +17,8 @@
 <script setup>
 import styles from './GameScreen.module.css';
 import { computed } from 'vue';
-import Score from '../ui/Score.vue';
-import store from '../../store.js';
+import Score from '../../ui/Score.vue';
+import store from '../../../store.js';
 
 defineProps({
   score: Number,

@@ -1,0 +1,51 @@
+.menuWrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(34, 38, 49, 0.97);
+  padding: 44px 38px 36px 38px;
+  border-radius: 18px;
+  color: #f3f3f3;
+  min-width: 340px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+  text-align: center;
+  z-index: 30;
+  animation: pop-in 0.7s cubic-bezier(.5,1.6,.4,1) 1;
+}
+.logoRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.logo {
+  height: 54px;
+  width: 54px;
+  filter: drop-shadow(0 2px 12px #5ad5fc60);
+}
+.menuButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 36px 0 18px 0;
+}
+.highScore {
+  margin-top: 20px;
+  font-size: 22px;
+  color: #FFD700;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px #000a;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s cubic-bezier(.5,1.6,.4,1);
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+@keyframes pop-in {
+  0% { transform: translate(-50%, -60%) scale(0.92); opacity: 0; }
+  80% { transform: translate(-50%, -52%) scale(1.04); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
