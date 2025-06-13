@@ -18,8 +18,10 @@
         <p>{{ mode.description }}</p>
       </div>
     </div>
-    <UIButton @click="confirmMode">Start</UIButton>
-    <UIButton @click="$emit('back')" style="margin-top: 10px">Back</UIButton>
+    <div class="button-row" style="display: flex; justify-content: center; gap: 18px; margin-top: 18px;">
+      <UIButton @click="confirmMode">Start</UIButton>
+      <UIButton @click="$emit('back')">Back</UIButton>
+    </div>
   </div>
 </template>
 
