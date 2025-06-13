@@ -66,7 +66,6 @@ const store = reactive({
       const idx = this.powerUps.findIndex(p => p.id === powerUpId);
       if (idx !== -1) this.powerUps[idx] = { ...powerUp };
       saveToLocalStorage('pangStoreState', { score: this.score, powerUps: this.powerUps });
-      console.log('[STORE] Power-up purchased:', powerUpId, this.powerUps);
       return true; // Purchase successful
     }
     return false; // Purchase failed
