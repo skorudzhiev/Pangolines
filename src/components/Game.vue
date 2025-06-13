@@ -18,13 +18,13 @@
     />
 
     <GameOverScreen v-if="gameOver.value"
-      :score="score.value"
+      :score="store.score"
       :highScore="highScore"
       @play-again="resetGame"
     />
 
     <GameScreen v-if="gameRunning"
-      :score="score.value"
+      :score="store.score"
       :comboCounter="comboCounter"
       :comboMultiplier="comboMultiplier"
       :classicMode="classicMode"
@@ -96,7 +96,7 @@ const { startGameLoop, stopGameLoop } = useGameLoop();
 const { player, updatePlayer, drawPlayer, resetPlayer } = usePlayer(gameWidth, gameHeight);
 const { bubbles, updateBubbles, drawBubbles, resetBubbles, initializeLevel, addRandomBubbles } = useBubbles(gameWidth, gameHeight);
 const { projectiles, updateProjectiles, drawProjectiles, fireProjectile, resetProjectiles } = useProjectiles();
-const { score, gameOver, checkCollisions, resetGameState, onBubbleHit } = useCollisions(player, bubbles, projectiles);
+const { gameOver, checkCollisions, resetGameState, onBubbleHit } = useCollisions(player, bubbles, projectiles);
 
 // Purchasing logic
 const purchasePowerUp = (powerUpId) => {
@@ -179,8 +179,8 @@ const updateGame = () => {
     console.log('Game over detected:', gameOver.value);
     gameRunning.value = false;
     stopGameLoop();
-    if (score.value > highScore.value) {
-      highScore.value = score.value;
+    if (store.score > highScore.value) {
+      highScore.value = store.score;
       saveToLocalStorage('pangHighScore', highScore.value);
     }
   }
@@ -225,8 +225,7 @@ const resetGame = () => {
   window.floatingTexts = floatingTexts.value;
   difficulty.value = 1;
 
-  // If you want to reset power-ups each run:
-  // store.resetPowerUps();
+  store.resetPowerUps();
 
   if (gameContainer.value) {
     gameContainer.value.focus();

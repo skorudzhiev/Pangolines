@@ -1,7 +1,10 @@
 import { ref } from 'vue';
+import store from '../../store';
 
 export function useCollisions(player, bubbles, projectiles) {
-  const score = ref(0);
+  // Use store.score as the single source of truth for score
+  const score = store;
+  // const score = ref(0); // Removed
   const gameOver = ref(false);
   const bubbleHitCallbacks = [];
   
@@ -11,7 +14,7 @@ export function useCollisions(player, bubbles, projectiles) {
   };
   
   const resetGameState = () => {
-    score.value = 0;
+    store.score = 0;
     gameOver.value = false;
   };
   
@@ -80,7 +83,7 @@ export function useCollisions(player, bubbles, projectiles) {
           
           // Add score - with combo multiplier applied
           const pointsEarned = Math.round(bubble.points * comboMultiplier);
-          score.value += pointsEarned;
+          store.score += pointsEarned;
           
           // Notify all registered callbacks about the bubble hit
           bubbleHitCallbacks.forEach(callback => callback());
@@ -160,10 +163,11 @@ export function useCollisions(player, bubbles, projectiles) {
   };
   
   return {
-    score,
+    score: store,
     gameOver,
     checkCollisions,
     resetGameState,
     onBubbleHit
   };
+
 }
