@@ -1,4 +1,5 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import store from '../../store.js';
 
 export function usePlayer(gameWidth, gameHeight) {
   const player = ref({
@@ -10,6 +11,23 @@ export function usePlayer(gameWidth, gameHeight) {
     color: '#42b883'
   });
   
+  // Watch for 'Faster Movement' power-up and update speed
+  function updateSpeedFromPowerUp() {
+    const faster = store.powerUps.find(p => p.id === 'fasterMovement' && p.isPurchased);
+    player.value.speed = faster ? 8 : 5;
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[DEBUG] Player speed:', player.value.speed, 'FasterMovement:', !!faster);
+    }
+  }
+  updateSpeedFromPowerUp();
+  
+  // Reactively update speed if power-up is bought
+  watch(
+    () => store.powerUps.find(p => p.id === 'fasterMovement')?.isPurchased,
+    () => updateSpeedFromPowerUp(),
+    { immediate: true }
+  );
+
   const resetPlayer = () => {
     // Position the player at the bottom center of the screen
     player.value.x = (gameWidth - player.value.width) / 2;
@@ -21,6 +39,9 @@ export function usePlayer(gameWidth, gameHeight) {
   
   const updatePlayer = (keysPressed) => {
     // Move player left/right based on keys pressed
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[DEBUG] updatePlayer: speed', player.value.speed, 'x:', player.value.x);
+    }
     if (keysPressed.ArrowLeft) {
       player.value.x = Math.max(0, player.value.x - player.value.speed);
     }

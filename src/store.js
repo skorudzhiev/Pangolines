@@ -60,8 +60,13 @@ const store = reactive({
     const powerUp = this.powerUps.find((p) => p.id === powerUpId);
     if (powerUp && this.score >= powerUp.cost && !powerUp.isPurchased) {
       this.score -= powerUp.cost;
+      // Mutate in-place for reactivity
       powerUp.isPurchased = true;
+      // Vue 3 reactivity: force update if needed
+      const idx = this.powerUps.findIndex(p => p.id === powerUpId);
+      if (idx !== -1) this.powerUps[idx] = { ...powerUp };
       saveToLocalStorage('pangStoreState', { score: this.score, powerUps: this.powerUps });
+      console.log('[STORE] Power-up purchased:', powerUpId, this.powerUps);
       return true; // Purchase successful
     }
     return false; // Purchase failed
