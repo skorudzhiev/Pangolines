@@ -44,15 +44,15 @@
 <script setup>
 import styles from './Game.module.css';
 import { onMounted, ref } from 'vue';
-import MainMenu from './screens/MainMenu.vue';
-import StoreScreen from './screens/StoreScreen.vue';
-import GameOverScreen from './screens/GameOverScreen.vue';
-import GameScreen from './screens/GameScreen.vue';
+import MainMenu from './screens/MainMenu/MainMenu.vue';
+import StoreScreen from './screens/Store/StoreScreen.vue';
+import GameOverScreen from './screens/GameOver/GameOverScreen.vue';
+import GameScreen from './screens/GameScreen/GameScreen.vue';
 import PowerUpIndicator from './PowerUpIndicator.vue';
 import GameCanvas from './GameCanvas.vue';
-import { useGameState } from './useGameState';
-import { useGameLogic } from './useGameLogic';
-import { useGameEngine } from './useGameEngine';
+import { useGameState } from '../composables/useGameState';
+import { useGameLogic } from '../composables/useGameLogic';
+import { useGameEngine } from '../composables/useGameEngine';
 import { debounce, saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers';
 
 // State

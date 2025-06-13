@@ -18,7 +18,7 @@
 
 <script setup>
 import styles from './StoreScreen.module.css';
-import UIButton from '../ui/UIButton.vue'
+import UIButton from '../../ui/UIButton.vue'
 defineProps({ score: Number, powerUps: Array })
 defineEmits(['purchase', 'close-store'])
 </script>

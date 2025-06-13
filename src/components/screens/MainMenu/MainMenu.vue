@@ -22,9 +22,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import styles from './MainMenu.module.css';
-import UIButton from '../ui/UIButton.vue';
-import SettingsScreen from './SettingsScreen.vue';
-import GameModeSelectionScreen from './GameModeSelectionScreen.vue';
+import UIButton from '../../ui/UIButton.vue';
+import SettingsScreen from '../Settings/SettingsScreen.vue';
+import GameModeSelectionScreen from '../GameModeSelection/GameModeSelectionScreen.vue';
 
 defineProps({ highScore: Number })
 const emit = defineEmits(['start-game', 'show-store'])

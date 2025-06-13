@@ -27,7 +27,7 @@
 <script setup>
 import { ref } from 'vue';
 import styles from './SettingsScreen.module.css';
-import UIButton from '../ui/UIButton.vue';
+import UIButton from '../../ui/UIButton.vue';
 
 defineEmits(['back'])
 const musicEnabled = ref(true);

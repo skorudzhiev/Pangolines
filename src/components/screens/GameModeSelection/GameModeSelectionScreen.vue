@@ -28,7 +28,7 @@
 <script setup>
 import { ref } from 'vue';
 import styles from './GameModeSelectionScreen.module.css';
-import UIButton from '../ui/UIButton.vue';
+import UIButton from '../../ui/UIButton.vue';
 
 const emit = defineEmits(['select-mode', 'back'])
 const modes = [
