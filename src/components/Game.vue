@@ -54,6 +54,7 @@ import { useGameState } from '../composables/useGameState';
 import { useGameLogic } from '../composables/useGameLogic';
 import { useGameEngine } from '../composables/useGameEngine';
 import { debounce, saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers';
+import { useParticles } from '../composables/useParticles';
 
 // State
 const {
@@ -75,6 +76,9 @@ const {
 } = useGameState();
 
 const gameCanvasRef = ref(null);
+
+// Particle system
+const { spawnParticles, updateParticles, drawParticles } = useParticles();
 
 // Game engine systems (all-in-one)
 const {
@@ -187,13 +191,27 @@ const startGame = (classic = false) => {
   }
   gameRunning.value = true;
   gameContainer.value.focus();
-  startGameLoop(() => updateGame(gameCanvasRef.value?.gameCanvas?.getContext('2d')));
+  startGameLoop(() => {
+    const ctx = gameCanvasRef.value?.gameCanvas?.getContext('2d');
+    if (!ctx) return;
+    updateGame(ctx);
+    updateParticles();
+    drawParticles(ctx);
+  });
 };
 
 onMounted(() => {
   highScore.value = loadFromLocalStorage('pangHighScore', 0);
   // Register combo logic callback for bubble hits
-  onBubbleHit(increaseCombo);
+  onBubbleHit((...args) => {
+    increaseCombo(...args);
+    // Find bubble position for particle spawn
+    // Use last floatingText as proxy for bubble position
+    if (window.floatingTexts && window.floatingTexts.length > 0) {
+      const lastText = window.floatingTexts[window.floatingTexts.length - 1];
+      spawnParticles({ x: lastText.x, y: lastText.y });
+    }
+  });
 });
 </script>
 
