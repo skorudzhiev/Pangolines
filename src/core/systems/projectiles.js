@@ -16,15 +16,7 @@ export function useProjectiles() {
     const hasExplosive = store.powerUps.find(p => p.id === 'explosiveProjectiles' && p.isPurchased);
     const width = hasLargerShots ? 8 : 4;
     const isExplosive = !!hasExplosive;
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[DEBUG] fireProjectile:', {
-        largerShots: !!hasLargerShots,
-        doubleProjectiles: !!hasDoubleProjectiles,
-        explosiveProjectiles: !!hasExplosive,
-        width,
-        isExplosive
-      });
-    }
+    
     // Only allow up to maxProjectiles (default 1)
     if (projectiles.value.length < maxProjectiles.value) {
       // Main projectile
@@ -38,9 +30,6 @@ export function useProjectiles() {
         active: true,
         explosive: isExplosive
       });
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[DEBUG] Projectile created:', projectiles.value[projectiles.value.length - 1]);
-      }
       // Double shot
       if (hasDoubleProjectiles) {
         // Slight horizontal offset for second projectile
@@ -54,9 +43,6 @@ export function useProjectiles() {
           active: true,
           explosive: isExplosive
         });
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('[DEBUG] Double Projectile created:', projectiles.value[projectiles.value.length - 1]);
-        }
       }
     }
   };

@@ -15,9 +15,6 @@ export function usePlayer(gameWidth, gameHeight) {
   function updateSpeedFromPowerUp() {
     const faster = store.powerUps.find(p => p.id === 'fasterMovement' && p.isPurchased);
     player.value.speed = faster ? 8 : 5;
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[DEBUG] Player speed:', player.value.speed, 'FasterMovement:', !!faster);
-    }
   }
   updateSpeedFromPowerUp();
   
@@ -39,9 +36,6 @@ export function usePlayer(gameWidth, gameHeight) {
   
   const updatePlayer = (keysPressed) => {
     // Move player left/right based on keys pressed
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[DEBUG] updatePlayer: speed', player.value.speed, 'x:', player.value.x);
-    }
     if (keysPressed.ArrowLeft) {
       player.value.x = Math.max(0, player.value.x - player.value.speed);
     }

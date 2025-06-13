@@ -79,10 +79,6 @@ export function useCollisions(player, bubbles, projectiles) {
            // Remove the projectile
            projectile.active = false;
 
-           // Debug: Log if projectile is explosive
-           if (process.env.NODE_ENV !== 'production') {
-             console.log('[DEBUG] Projectile hit bubble. Explosive:', projectile.explosive);
-           }
           const projectileIndex = projectiles.value.indexOf(projectile);
           projectiles.value.splice(projectileIndex, 1);
           
