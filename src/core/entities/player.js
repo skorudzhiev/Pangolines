@@ -29,7 +29,7 @@ export function usePlayer(gameWidth, gameHeight) {
     }
   };
   
-  const drawPlayer = (ctx) => {
+  const drawPlayer = (ctx, debugMode = false) => {
     ctx.fillStyle = player.value.color;
     
     // Draw player body
@@ -50,6 +50,31 @@ export function usePlayer(gameWidth, gameHeight) {
       Math.PI * 2
     );
     ctx.fill();
+
+    // Debug: draw hitboxes
+    if (debugMode) {
+      ctx.save();
+      ctx.strokeStyle = 'blue';
+      ctx.lineWidth = 2;
+      // Rectangle hitbox
+      ctx.strokeRect(
+        player.value.x,
+        player.value.y,
+        player.value.width,
+        player.value.height
+      );
+      // Head hitbox
+      ctx.beginPath();
+      ctx.arc(
+        player.value.x + player.value.width / 2,
+        player.value.y,
+        player.value.width / 2.5,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+      ctx.restore();
+    }
   };
   
   return {
