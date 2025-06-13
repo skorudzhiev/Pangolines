@@ -3,7 +3,7 @@
     <div :class="styles.menuWrapper" v-if="showMenu">
       <div :class="styles.logoRow">
         <img :class="styles.logo" src="/logo.svg" alt="Pang Logo" />
-        <h1>Pang</h1>
+        <h1>Pangolines</h1>
       </div>
       <div :class="styles.menuButtons">
         <UIButton @click="showModeScreen = true">Start Game</UIButton>
