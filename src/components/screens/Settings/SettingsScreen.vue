@@ -30,7 +30,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import useAudioManager from '@/composables/useAudioManager';
+import useAudioManager from '../../../composables/useAudioManager';
 import styles from './SettingsScreen.module.css';
 import UIButton from '../../ui/UIButton.vue';
 

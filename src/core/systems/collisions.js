@@ -1,12 +1,15 @@
 import { ref } from 'vue';
 import store from '../../store.js';
 
+import useAudioManager from '../../composables/useAudioManager';
+
 export function useCollisions(player, bubbles, projectiles) {
   // Use store.score as the single source of truth for score
   const score = store;
   // const score = ref(0); // Removed
   const gameOver = ref(false);
   const bubbleHitCallbacks = [];
+  const { playSfx } = useAudioManager();
   
   // Register a callback for bubble hits (for combo system)
   const onBubbleHit = (callback) => {
@@ -79,8 +82,11 @@ export function useCollisions(player, bubbles, projectiles) {
            // Remove the projectile
            projectile.active = false;
 
-          const projectileIndex = projectiles.value.indexOf(projectile);
-          projectiles.value.splice(projectileIndex, 1);
+           // Play pop SFX
+           playSfx('assets/audio/pop.mp3');
+
+           const projectileIndex = projectiles.value.indexOf(projectile);
+           projectiles.value.splice(projectileIndex, 1);
           
           // Add score - with combo multiplier applied
           const pointsEarned = Math.round(bubble.points * comboMultiplier);

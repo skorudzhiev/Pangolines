@@ -25,12 +25,18 @@ let bgmAudio = null;
 const sfxAudios = {};
 
 function loadAudio(src, loop = false) {
-  const audio = new Audio(src);
+  // Support require() or direct string
+  let resolvedSrc = src;
+  if (src && typeof src === 'object' && src.default) {
+    resolvedSrc = src.default;
+  }
+  const audio = new Audio(resolvedSrc);
   audio.loop = loop;
   audio.preload = 'auto';
   return audio;
 }
 
+// Usage: playMusic('relative/path/to/music.mp3')
 function playMusic(src) {
   if (!musicEnabled.value) return;
   if (bgmAudio) {
@@ -49,6 +55,7 @@ function stopMusic() {
   }
 }
 
+// Usage: playSfx('relative/path/to/sfx.mp3')
 function playSfx(src) {
   if (!sfxEnabled.value) return;
   if (!sfxAudios[src]) {
