@@ -1,6 +1,8 @@
 import { ref } from 'vue';
 
 export const bubbleSizes = [
+  { radius: 120, speed: 0.8, points: 2 },   // Colossal
+  { radius: 100, speed: 1.0, points: 3 },   // Titanic
   { radius: 80, speed: 1.2, points: 5 },    // Giant
   { radius: 60, speed: 1.5, points: 10 },   // Large
   { radius: 40, speed: 2, points: 20 },     // Medium
@@ -159,18 +161,32 @@ export function useBubbles(gameWidth, gameHeight) {
     speedMultipliers.value = Array(bubbleSizes.length).fill(1).map((_, i) => 1 + (difficulty - 1) * 0.2 + i * 0.05);
 
     for (let i = 0; i < count; i++) {
-      // Bubble size selection: higher difficulty = more small bubbles
-      let sizeOptions = [0];
-      if (difficulty > 1) sizeOptions.push(1);
-      if (difficulty > 2) sizeOptions.push(2);
-      if (difficulty > 3) sizeOptions.push(3);
-      if (difficulty > 5) sizeOptions.push(4);
-      // Weight toward smaller bubbles at higher difficulty
-      if (difficulty > 6) sizeOptions.push(3, 4);
-      const size = sizeOptions[Math.floor(Math.random() * sizeOptions.length)];
+      // Determine the largest size index available at this difficulty
+      // At diff 1: only size 0, diff 2: 0-1, diff 3: 0-2, etc.
+      const maxSizeIndex = Math.min(Math.floor(difficulty + 1), bubbleSizes.length - 1);
+      // Create a weighted array favoring smaller bubbles at higher difficulty
+      let weights = [];
+      for (let s = 0; s <= maxSizeIndex; s++) {
+        // Larger index = smaller bubble, so bias toward small at high difficulty
+        const base = Math.max(1, (s + 1) * (bubbleSizes.length - s));
+        // At higher difficulties, increase weight for smaller bubbles
+        const weight = base + (difficulty > 5 ? (bubbleSizes.length - s) * difficulty : 0);
+        weights.push(weight);
+      }
+      // Normalize weights and pick a size
+      const total = weights.reduce((a, b) => a + b, 0);
+      let rnd = Math.random() * total;
+      let chosenSize = 0;
+      for (let s = 0; s <= maxSizeIndex; s++) {
+        if (rnd < weights[s]) {
+          chosenSize = s;
+          break;
+        }
+        rnd -= weights[s];
+      }
       const x = Math.random() * (gameWidth - 200) + 100;
       const y = 100;
-      bubbles.value.push(createBubble(x, y, size));
+      bubbles.value.push(createBubble(x, y, chosenSize));
     }
   };
   

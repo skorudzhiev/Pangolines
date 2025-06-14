@@ -2,26 +2,36 @@ import { ref } from 'vue';
 
 // Level configurations for classic mode (example structure, adjust as needed)
 export const levelConfigurations = [
-  // Level 1: Easiest, just one large bubble
-  { bubbleCounts: [1, 0, 0], speeds: [0.9, 1, 1] },
-  // Level 2: Two large bubbles
-  { bubbleCounts: [2, 0, 0], speeds: [1, 1, 1] },
-  // Level 3: Two large, one medium
-  { bubbleCounts: [2, 1, 0], speeds: [1, 1, 1] },
-  // Level 4: Two large, two medium
-  { bubbleCounts: [2, 2, 0], speeds: [1.05, 1.05, 1] },
-  // Level 5: Two large, two medium, one small
-  { bubbleCounts: [2, 2, 1], speeds: [1.1, 1.1, 1.05] },
-  // Level 6: Three large, two medium, one small
-  { bubbleCounts: [3, 2, 1], speeds: [1.15, 1.15, 1.1] },
-  // Level 7: Three large, three medium, two small
-  { bubbleCounts: [3, 3, 2], speeds: [1.2, 1.2, 1.15] },
-  // Level 8: Four large, three medium, two small
-  { bubbleCounts: [4, 3, 2], speeds: [1.25, 1.25, 1.2] },
-  // Level 9: Four large, four medium, three small
-  { bubbleCounts: [4, 4, 3], speeds: [1.3, 1.3, 1.25] },
-  // Level 10: Five large, four medium, four small (final challenge)
-  { bubbleCounts: [5, 4, 4], speeds: [1.4, 1.35, 1.3] },
+  // Level 1: Only 1 Colossal bubble
+  { bubbleCounts: [1, 0, 0, 0, 0, 0, 0], speeds: [0.8, 1, 1.2, 1.5, 2, 2.7, 3.5] },
+  // Level 2: 1 Colossal, 1 Titanic
+  { bubbleCounts: [1, 1, 0, 0, 0, 0, 0], speeds: [0.85, 1.05, 1.2, 1.5, 2, 2.7, 3.5] },
+  // Level 3: 2 Titanic
+  { bubbleCounts: [0, 2, 0, 0, 0, 0, 0], speeds: [0.9, 1.1, 1.25, 1.5, 2, 2.7, 3.5] },
+  // Level 4: 1 Titanic, 1 Giant
+  { bubbleCounts: [0, 1, 1, 0, 0, 0, 0], speeds: [0.9, 1.15, 1.3, 1.55, 2, 2.7, 3.5] },
+  // Level 5: 1 Titanic, 2 Giant
+  { bubbleCounts: [0, 1, 2, 0, 0, 0, 0], speeds: [0.95, 1.2, 1.35, 1.6, 2, 2.7, 3.5] },
+  // Level 6: 2 Giant, 1 Large
+  { bubbleCounts: [0, 0, 2, 1, 0, 0, 0], speeds: [1, 1.25, 1.4, 1.65, 2, 2.7, 3.5] },
+  // Level 7: 1 Giant, 2 Large, 1 Medium
+  { bubbleCounts: [0, 0, 1, 2, 1, 0, 0], speeds: [1, 1.3, 1.45, 1.7, 2.05, 2.7, 3.5] },
+  // Level 8: 1 Giant, 2 Large, 2 Medium
+  { bubbleCounts: [0, 0, 1, 2, 2, 0, 0], speeds: [1.05, 1.35, 1.5, 1.75, 2.1, 2.7, 3.5] },
+  // Level 9: 2 Large, 2 Medium, 1 Small
+  { bubbleCounts: [0, 0, 0, 2, 2, 1, 0], speeds: [1.1, 1.4, 1.55, 1.8, 2.15, 2.75, 3.5] },
+  // Level 10: 1 Large, 2 Medium, 2 Small
+  { bubbleCounts: [0, 0, 0, 1, 2, 2, 0], speeds: [1.15, 1.45, 1.6, 1.85, 2.2, 2.8, 3.5] },
+  // Level 11: 1 Medium, 3 Small, 1 Tiny
+  { bubbleCounts: [0, 0, 0, 0, 1, 3, 1], speeds: [1.2, 1.5, 1.65, 1.9, 2.25, 2.85, 3.6] },
+  // Level 12: 2 Medium, 2 Small, 2 Tiny
+  { bubbleCounts: [0, 0, 0, 0, 2, 2, 2], speeds: [1.25, 1.55, 1.7, 1.95, 2.3, 2.9, 3.7] },
+  // Level 13: 1 Large, 2 Medium, 3 Small, 2 Tiny
+  { bubbleCounts: [0, 0, 0, 1, 2, 3, 2], speeds: [1.3, 1.6, 1.75, 2, 2.35, 3, 3.8] },
+  // Level 14: 1 Giant, 1 Large, 2 Medium, 3 Small, 3 Tiny
+  { bubbleCounts: [0, 0, 1, 1, 2, 3, 3], speeds: [1.35, 1.7, 1.8, 2.05, 2.4, 3.1, 3.9] },
+  // Level 15: 2 Large, 2 Medium, 4 Small, 4 Tiny (final challenge)
+  { bubbleCounts: [0, 0, 0, 2, 2, 4, 4], speeds: [1.4, 1.8, 1.9, 2.1, 2.5, 3.2, 4] },
 ];
 
 export function useGameLogic({
