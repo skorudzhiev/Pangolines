@@ -1,9 +1,12 @@
 import { ref } from 'vue';
 import store from '../../store.js';
 
+import useAudioManager from '../../composables/useAudioManager';
+
 export function useProjectiles() {
   const projectiles = ref([]);
   const maxProjectiles = ref(1); // Default limit of 1 projectile at a time
+  const { playSfx } = useAudioManager();
   
   const resetProjectiles = () => {
     projectiles.value = [];
@@ -19,6 +22,8 @@ export function useProjectiles() {
     
     // Only allow up to maxProjectiles (default 1)
     if (projectiles.value.length < maxProjectiles.value) {
+      // Play shoot SFX
+      playSfx('/src/assets/audio/shoot.mp3');
       // Main projectile
       projectiles.value.push({
         x: x - width / 2, // Center

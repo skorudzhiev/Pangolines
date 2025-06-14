@@ -30,17 +30,17 @@
 
 <script setup>
 import { ref } from 'vue';
+import useAudioManager from '../../../composables/useAudioManager';
 import styles from './SettingsScreen.module.css';
 import UIButton from '../../ui/UIButton.vue';
 
 defineEmits(['back'])
 import { onMounted, watch } from 'vue';
-const musicEnabled = ref(true);
-const sfxEnabled = ref(true);
+const { musicEnabled, sfxEnabled } = useAudioManager();
 const controlScheme = ref('classic');
 const particlesEnabled = ref(true);
 
-// Load initial value from localStorage
+// Load initial value from localStorage for particles
 onMounted(() => {
   const stored = localStorage.getItem('pangShowParticles');
   if (stored !== null) {
@@ -48,7 +48,7 @@ onMounted(() => {
   }
 });
 
-// Persist changes to localStorage
+// Persist changes to localStorage for particles
 watch(particlesEnabled, (val) => {
   localStorage.setItem('pangShowParticles', val);
 });
