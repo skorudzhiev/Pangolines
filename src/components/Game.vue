@@ -47,7 +47,7 @@
 
 <script setup>
 import styles from './Game.module.css';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import MainMenu from './screens/MainMenu/MainMenu.vue';
 import StoreScreen from './screens/Store/StoreScreen.vue';
 import GameOverScreen from './screens/GameOver/GameOverScreen.vue';
@@ -57,6 +57,7 @@ import GameCanvas from './GameCanvas.vue';
 import { useGameState } from '../composables/useGameState';
 import { useGameLogic } from '../composables/useGameLogic';
 import { useGameEngine } from '../composables/useGameEngine';
+import useAudioManager from '../composables/useAudioManager';
 import { debounce, saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers';
 import { useParticles } from '../composables/useParticles';
 import { useComboFloatingText } from '../composables/useComboFloatingText';
@@ -86,11 +87,9 @@ const gameCanvasRef = ref(null);
 const { spawnParticles, updateParticles, drawParticles } = useParticles();
 
 // Settings: show/hide particles
-import { computed } from 'vue';
 const showParticles = ref(loadFromLocalStorage('pangShowParticles', true));
 
 // Keep showParticles in sync with localStorage changes (e.g., from SettingsScreen)
-import { watch } from 'vue';
 window.addEventListener('storage', (event) => {
   if (event.key === 'pangShowParticles') {
     showParticles.value = event.newValue === 'true';
@@ -212,7 +211,19 @@ const startGame = (classic = false) => {
   } else {
     resetBubbles();
   }
+  // Play background music when game starts
+  const { playMusic, musicEnabled, stopMusic } = useAudioManager();
+  if (musicEnabled.value) {
+    playMusic('/src/assets/audio/bgm.mp3');
+  }
+  // Watch for gameOver to stop music
+  watch(gameOver, (val) => {
+    if (val) {
+      stopMusic();
+    }
+  });
   gameRunning.value = true;
+  console.log('[DEBUG] Game started: gameRunning', gameRunning.value, 'gameOver', gameOver.value);
   gameContainer.value.focus();
   startGameLoop(() => {
     const ctx = gameCanvasRef.value?.gameCanvas?.getContext('2d');
