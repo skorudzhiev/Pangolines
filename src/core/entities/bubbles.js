@@ -1,18 +1,19 @@
 import { ref } from 'vue';
 
-export function useBubbles(gameWidth, gameHeight) {
-  const bubbles = ref([]);
-  const speedMultipliers = ref([1, 1, 1]);
-  const difficultyMultiplier = ref(1);
-  
-  // Bubble sizes and properties
-  const bubbleSizes = [
+export const bubbleSizes = [
   { radius: 80, speed: 1.2, points: 5 },    // Giant
   { radius: 60, speed: 1.5, points: 10 },   // Large
   { radius: 40, speed: 2, points: 20 },     // Medium
   { radius: 25, speed: 2.7, points: 35 },   // Small
   { radius: 14, speed: 3.5, points: 55 }    // Tiny
 ];
+
+export function useBubbles(gameWidth, gameHeight) {
+  const bubbles = ref([]);
+  const speedMultipliers = ref([1, 1, 1]);
+  const difficultyMultiplier = ref(1);
+  // Reference bubbleSizes here, do not redeclare
+
   
   const createBubble = (x, y, size = 0, velocityX = null) => {
     const bubbleSize = bubbleSizes[size];
