@@ -104,9 +104,9 @@ export function useGameLogic({
         saveToLocalStorage('pangHighScore', highScore.value);
       }
     }
-    if (classicMode.value && bubbles.value.length === 0) {
-      advanceToNextLevel();
-    }
+    // if (classicMode.value && bubbles.value.length === 0) {
+    //   advanceToNextLevel();
+    // }
     if (!classicMode.value && bubbles.value.length < 3 && Math.random() < 0.02) {
       difficulty.value += 0.05;
       addRandomBubbles(Math.min(Math.floor(difficulty.value), 3), difficulty.value);

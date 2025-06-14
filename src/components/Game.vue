@@ -33,10 +33,15 @@
         :comboCounter="comboCounter"
         :comboMultiplier="comboMultiplier"
         :classicMode="classicMode"
-      :currentLevel="currentLevel"
-      :difficulty="difficulty"
-      :class="styles.gameUi"
-    />
+        :currentLevel="currentLevel"
+        :difficulty="difficulty"
+        :class="styles.gameUi"
+      />
+      <PauseScreen
+        v-if="showPauseScreen"
+        @next-level="onNextLevel"
+        @main-menu="onPauseMainMenu"
+      />
     <SettingsScreen v-if="!gameRunning && !gameOver.value && showSettings"
       @toggle-particles="val => { showParticles.value = val; saveToLocalStorage('pangShowParticles', val); }"
       @back="showSettings = false"
@@ -52,6 +57,7 @@ import MainMenu from './screens/MainMenu/MainMenu.vue';
 import StoreScreen from './screens/Store/StoreScreen.vue';
 import GameOverScreen from './screens/GameOver/GameOverScreen.vue';
 import GameScreen from './screens/GameScreen/GameScreen.vue';
+import PauseScreen from './screens/PauseScreen/PauseScreen.vue';
 import PowerUpIndicator from './PowerUpIndicator.vue';
 import GameCanvas from './GameCanvas.vue';
 import { useGameState } from '../composables/useGameState';
@@ -129,11 +135,14 @@ const {
 const { showComboText, drawFloatingTexts } = useComboFloatingText(floatingTexts);
 
 // Game logic
+const showPauseScreen = ref(false);
+let pendingAdvance = false;
+
 const {
   resetCombo,
   increaseCombo,
   advanceToNextLevel,
-  updateGame
+  updateGame: originalUpdateGame
 } = useGameLogic({
   player,
   bubbles,
@@ -170,6 +179,43 @@ const {
   loadFromLocalStorage,
   keysPressed
 });
+
+// Patch updateGame to handle pause between levels in classic mode
+const updateGame = (ctx) => {
+  if (!gameRunning.value || showPauseScreen.value) return;
+  originalUpdateGame(ctx);
+  // If classic mode and all bubbles cleared, show pause screen
+  if (classicMode.value && bubbles.value.length === 0 && !showPauseScreen.value && !gameOver.value) {
+    showPauseScreen.value = true;
+    pendingAdvance = true;
+    stopGameLoop();
+  }
+};
+
+const onNextLevel = () => {
+  showPauseScreen.value = false;
+  if (pendingAdvance) {
+    advanceToNextLevel();
+    pendingAdvance = false;
+    gameRunning.value = true;
+    // Resume game loop exactly as in startGame
+    startGameLoop(() => {
+      const ctx = gameCanvasRef.value?.gameCanvas?.getContext('2d');
+      if (!ctx) return;
+      updateGame(ctx);
+      if (showParticles.value) {
+        updateParticles();
+        drawParticles(ctx);
+      }
+    });
+  }
+};
+
+const onPauseMainMenu = () => {
+  showPauseScreen.value = false;
+  gameRunning.value = false;
+  resetGame();
+};
 
 // Purchasing logic
 const purchasePowerUp = (powerUpId) => {
@@ -233,7 +279,8 @@ const startGame = (classic = false) => {
       updateParticles();
       drawParticles(ctx);
     }
-  });
+  }); // updateGame is now the patched version with pause logic
+
 };
 
 onMounted(() => {

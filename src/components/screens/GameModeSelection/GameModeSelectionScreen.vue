@@ -33,7 +33,7 @@ import UIButton from '../../ui/UIButton.vue';
 const emit = defineEmits(['select-mode', 'back'])
 const modes = [
   { value: 'arcade', label: 'Arcade', description: 'Modern progression, power-ups, and new challenges.' },
-  { value: 'classic', label: 'Classic', description: 'Retro gameplay, no power-ups, original rules.' },
+  { value: 'classic', label: 'Classic', description: 'Retro gameplay, original rules.' },
 ];
 const selectedMode = ref('arcade');
 function selectMode(mode) {
