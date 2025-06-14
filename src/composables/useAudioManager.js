@@ -36,7 +36,7 @@ function loadAudio(src, loop = false) {
   return audio;
 }
 
-// Usage: playMusic('relative/path/to/music.mp3')
+// Usage: playMusic('/src/assets/audio/bgm.mp3') // Use absolute path for Vite
 function playMusic(src) {
   if (!musicEnabled.value) return;
   if (bgmAudio) {
@@ -55,7 +55,7 @@ function stopMusic() {
   }
 }
 
-// Usage: playSfx('relative/path/to/sfx.mp3')
+// Usage: playSfx('/src/assets/audio/pop.mp3') // Use absolute path for Vite
 function playSfx(src) {
   if (!sfxEnabled.value) return;
   if (!sfxAudios[src]) {

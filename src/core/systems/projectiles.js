@@ -23,7 +23,7 @@ export function useProjectiles() {
     // Only allow up to maxProjectiles (default 1)
     if (projectiles.value.length < maxProjectiles.value) {
       // Play shoot SFX
-      playSfx('assets/audio/shoot.mp3');
+      playSfx('/src/assets/audio/shoot.mp3');
       // Main projectile
       projectiles.value.push({
         x: x - width / 2, // Center
