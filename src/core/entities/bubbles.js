@@ -7,10 +7,12 @@ export function useBubbles(gameWidth, gameHeight) {
   
   // Bubble sizes and properties
   const bubbleSizes = [
-    { radius: 60, speed: 1.5, points: 10 },
-    { radius: 40, speed: 2, points: 20 },
-    { radius: 20, speed: 2.5, points: 30 }
-  ];
+  { radius: 80, speed: 1.2, points: 5 },    // Giant
+  { radius: 60, speed: 1.5, points: 10 },   // Large
+  { radius: 40, speed: 2, points: 20 },     // Medium
+  { radius: 25, speed: 2.7, points: 35 },   // Small
+  { radius: 14, speed: 3.5, points: 55 }    // Tiny
+];
   
   const createBubble = (x, y, size = 0, velocityX = null) => {
     const bubbleSize = bubbleSizes[size];
@@ -31,10 +33,10 @@ export function useBubbles(gameWidth, gameHeight) {
   };
   
   const resetBubbles = () => {
-    // Reset speed multipliers to default values
-    speedMultipliers.value = [1, 1, 1];
+    // Reset speed multipliers to default values for all sizes
+    speedMultipliers.value = Array(bubbleSizes.length).fill(1);
 
-    // Start with 2 large bubbles
+    // Start with 2 giant bubbles
     bubbles.value = [
       createBubble(gameWidth / 3, gameHeight - 200, 0),
       createBubble(gameWidth * 2 / 3, gameHeight - 200, 0)
@@ -42,21 +44,19 @@ export function useBubbles(gameWidth, gameHeight) {
   };
   
   const initializeLevel = (bubbleCounts, speeds) => {
-    // Update speed multipliers
-    speedMultipliers.value = speeds;
-    
+    // Update speed multipliers, pad/truncate for new sizes
+    speedMultipliers.value = speeds.length === bubbleSizes.length ? speeds : Array(bubbleSizes.length).fill(1).map((_, i) => speeds[i] || 1);
+
     // Clear existing bubbles
     bubbles.value = [];
-    
+
     // Create bubbles based on the level configuration
     for (let size = 0; size < bubbleCounts.length; size++) {
       const count = bubbleCounts[size];
-      
       for (let i = 0; i < count; i++) {
         // Calculate position with good spacing based on the number of bubbles
         const x = (gameWidth / (count + 1)) * (i + 1);
-        const y = gameHeight - 200 - (size * 50); // Stagger heights based on size
-        
+        const y = gameHeight - 200 - (size * 50);
         bubbles.value.push(createBubble(x, y, size));
       }
     }
@@ -102,13 +102,18 @@ export function useBubbles(gameWidth, gameHeight) {
     // Remove the hit bubble
     const index = bubbles.value.indexOf(bubble);
     bubbles.value.splice(index, 1);
-    
+
     // If not the smallest size, split into two smaller bubbles
     if (bubble.size < bubbleSizes.length - 1) {
       const newSize = bubble.size + 1;
+      // For extra variety, randomize the horizontal speed slightly
+      const baseSpeed = bubbleSizes[newSize].speed;
+      const speedVariance = 0.4;
+      const leftSpeed = -(baseSpeed + (Math.random() - 0.5) * speedVariance);
+      const rightSpeed = baseSpeed + (Math.random() - 0.5) * speedVariance;
       bubbles.value.push(
-        createBubble(bubble.x, bubble.y, newSize, -bubbleSizes[newSize].speed),
-        createBubble(bubble.x, bubble.y, newSize, bubbleSizes[newSize].speed)
+        createBubble(bubble.x, bubble.y, newSize, leftSpeed),
+        createBubble(bubble.x, bubble.y, newSize, rightSpeed)
       );
     }
   };
@@ -148,26 +153,22 @@ export function useBubbles(gameWidth, gameHeight) {
   // Add random bubbles based on difficulty
   const addRandomBubbles = (count = 1, difficulty = 1) => {
     difficultyMultiplier.value = difficulty;
-    
-    // Calculate adjusted bubble speed based on difficulty
-    for (let i = 0; i < speedMultipliers.value.length; i++) {
-      speedMultipliers.value[i] = 1 + (difficulty - 1) * 0.2; // Gradually increase speed with difficulty
-    }
-    
-    // Add random bubbles
+
+    // Update speed multipliers for all bubble sizes
+    speedMultipliers.value = Array(bubbleSizes.length).fill(1).map((_, i) => 1 + (difficulty - 1) * 0.2 + i * 0.05);
+
     for (let i = 0; i < count; i++) {
-      // Randomly decide bubble size, with higher difficulty favoring smaller bubbles
-      let sizeOptions = [0]; // Start with just large bubbles
-      
-      if (difficulty > 2) sizeOptions.push(1); // Add medium bubbles after difficulty 2
-      if (difficulty > 4) sizeOptions.push(2); // Add small bubbles after difficulty 4
-      
+      // Bubble size selection: higher difficulty = more small bubbles
+      let sizeOptions = [0];
+      if (difficulty > 1) sizeOptions.push(1);
+      if (difficulty > 2) sizeOptions.push(2);
+      if (difficulty > 3) sizeOptions.push(3);
+      if (difficulty > 5) sizeOptions.push(4);
+      // Weight toward smaller bubbles at higher difficulty
+      if (difficulty > 6) sizeOptions.push(3, 4);
       const size = sizeOptions[Math.floor(Math.random() * sizeOptions.length)];
-      
-      // Place bubble at random position near the top
-      const x = Math.random() * (gameWidth - 200) + 100; // Keep away from edges
-      const y = 100; // Start near the top
-      
+      const x = Math.random() * (gameWidth - 200) + 100;
+      const y = 100;
       bubbles.value.push(createBubble(x, y, size));
     }
   };
