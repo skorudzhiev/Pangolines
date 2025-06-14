@@ -162,27 +162,27 @@ export function useBubbles(gameWidth, gameHeight) {
   speedMultipliers.value = Array(bubbleSizes.length).fill(1).map((_, i) => 1 + (difficulty - 1) * 0.08 + i * 0.03);
 
   for (let i = 0; i < count; i++) {
-    // At low difficulty, only largest bubbles; unlock smaller bubbles more slowly
-    const maxSizeIndex = Math.min(Math.floor((difficulty + 2) / 2), bubbleSizes.length - 1);
-    // Weighted array, but bias toward larger bubbles at low difficulty
+    // Only allow Medium (4) and smaller at the start; unlock larger at much higher difficulty
+    let minSizeIndex = 4; // Medium
+    let maxSizeIndex = Math.min(minSizeIndex + Math.floor((difficulty + 2) / 2) - 1, bubbleSizes.length - 1);
+    if (difficulty > 15) minSizeIndex = 0; // Allow all sizes at very high difficulty
     let weights = [];
-    for (let s = 0; s <= maxSizeIndex; s++) {
-      // At low difficulty, much higher weight for largest
+    for (let s = minSizeIndex; s <= maxSizeIndex; s++) {
+      // At low difficulty, much higher weight for largest available
       const base = Math.max(1, (maxSizeIndex + 1 - s) * 3);
       // At higher difficulties, increase weight for smaller bubbles
       const weight = base + (difficulty > 7 ? (bubbleSizes.length - s) * (difficulty - 6) : 0);
       weights.push(weight);
     }
-    // Normalize weights and pick a size
     const total = weights.reduce((a, b) => a + b, 0);
     let rnd = Math.random() * total;
-    let chosenSize = 0;
-    for (let s = 0; s <= maxSizeIndex; s++) {
-      if (rnd < weights[s]) {
-        chosenSize = s;
+    let chosenSize = minSizeIndex;
+    for (let idx = 0; idx < weights.length; idx++) {
+      if (rnd < weights[idx]) {
+        chosenSize = minSizeIndex + idx;
         break;
       }
-      rnd -= weights[s];
+      rnd -= weights[idx];
     }
     const x = Math.random() * (gameWidth - 200) + 100;
     const y = 100;
