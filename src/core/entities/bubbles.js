@@ -1,13 +1,13 @@
 import { ref } from 'vue';
 
 export const bubbleSizes = [
-  { radius: 120, speed: 1.3, points: 2 },   // Colossal
-  { radius: 100, speed: 1.6, points: 3 },   // Titanic
-  { radius: 80, speed: 1.9, points: 5 },    // Giant
-  { radius: 60, speed: 2.2, points: 10 },   // Large
-  { radius: 40, speed: 2.6, points: 20 },   // Medium
-  { radius: 25, speed: 3.2, points: 35 },   // Small
-  { radius: 14, speed: 4.0, points: 55 }    // Tiny
+  { radius: 120, speed: 1.3, points: 0.5 },   // Colossal
+  { radius: 100, speed: 1.6, points: 1 },   // Titanic
+  { radius: 80, speed: 1.9, points: 2 },    // Giant
+  { radius: 60, speed: 2.2, points: 3 },   // Large
+  { radius: 40, speed: 2.6, points: 4 },   // Medium
+  { radius: 25, speed: 3.2, points: 5 },   // Small
+  { radius: 14, speed: 4.0, points: 6 }    // Tiny
 ];
 
 export function useBubbles(gameWidth, gameHeight) {
@@ -162,15 +162,18 @@ export function useBubbles(gameWidth, gameHeight) {
   speedMultipliers.value = Array(bubbleSizes.length).fill(1).map((_, i) => 1 + (difficulty - 1) * 0.08 + i * 0.03);
 
   for (let i = 0; i < count; i++) {
-    // Only allow Medium (4) and smaller at the start; unlock larger at much higher difficulty
-    let minSizeIndex = 4; // Medium
-    let maxSizeIndex = Math.min(minSizeIndex + Math.floor((difficulty + 2) / 2) - 1, bubbleSizes.length - 1);
-    if (difficulty > 15) minSizeIndex = 0; // Allow all sizes at very high difficulty
+    // Arcade bubble size progression mimics classic mode
+    let minSizeIndex = 6  ; // Medium
+    let maxSizeIndex = 6; // Medium, Small, Tiny only
+    if (difficulty >= 8) maxSizeIndex = 5; // Add Large (radius 60)
+    if (difficulty >= 12) maxSizeIndex = 4; // Add Giant (radius 80)
+    if (difficulty >= 15) maxSizeIndex = 3; // Add Titanic (radius 100)
+    if (difficulty >= 18) maxSizeIndex = 2; // Add Colossal (radius 120)
+    // Only expand maxSizeIndex to allow larger bubbles at very high difficulty
     let weights = [];
     for (let s = minSizeIndex; s <= maxSizeIndex; s++) {
-      // At low difficulty, much higher weight for largest available
+      // Weight larger bubbles more at lower difficulties, shift to smaller at higher
       const base = Math.max(1, (maxSizeIndex + 1 - s) * 3);
-      // At higher difficulties, increase weight for smaller bubbles
       const weight = base + (difficulty > 7 ? (bubbleSizes.length - s) * (difficulty - 6) : 0);
       weights.push(weight);
     }
