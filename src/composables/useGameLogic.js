@@ -1,5 +1,39 @@
 import { ref } from 'vue';
 
+// Level configurations for classic mode (example structure, adjust as needed)
+export const levelConfigurations = [
+  // Level 1: Only 1 Medium bubble, slow
+  { bubbleCounts: [0, 0, 0, 0, 1, 0, 0], speeds: [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8] },
+  // Level 2: 2 Medium, still slow
+  { bubbleCounts: [0, 0, 0, 0, 2, 0, 0], speeds: [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8] },
+  // Level 3: 1 Medium, 1 Small
+  { bubbleCounts: [0, 0, 0, 1, 1, 1, 0], speeds: [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8] },
+  // Level 4: 2 Small, slow
+  { bubbleCounts: [0, 0, 1, 0, 1, 0, 0], speeds: [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9] },
+  // Level 5: 1 Small, 1 Tiny
+  { bubbleCounts: [0, 0, 0, 2, 2, 1, 0], speeds: [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9] },
+  // Level 6: 2 Giant
+  { bubbleCounts: [0, 0, 2, 0, 0, 0, 0], speeds: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] },
+  // Level 7: 1 Titanic
+  { bubbleCounts: [0, 1, 0, 0, 0, 0, 0], speeds: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] },
+  // Level 8: 2 Titanic
+  { bubbleCounts: [0, 2, 0, 0, 0, 0, 0], speeds: [1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1] },
+  // Level 9: 1 Colossal
+  { bubbleCounts: [1, 0, 0, 0, 0, 0, 0], speeds: [1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2] },
+  // Level 10: 2 Medium, 2 Small, 2 Tiny
+  { bubbleCounts: [0, 0, 0, 0, 2, 2, 2], speeds: [1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3] },
+  // Level 11: 1 Giant, 1 Medium, 2 Small, 2 Tiny
+  { bubbleCounts: [0, 0, 1, 1, 2, 2, 2], speeds: [1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4] },
+  // Level 12: 1 Large, 2 Medium, 2 Small, 2 Tiny
+  { bubbleCounts: [0, 0, 1, 2, 2, 2, 2], speeds: [1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5] },
+  // Level 13: 1 Large, 1 Medium, 2 Small, 3 Tiny
+  { bubbleCounts: [0, 0, 1, 1, 2, 2, 2], speeds: [1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6] },
+  // Level 14: 2 Large, 2 Medium, 3 Small, 3 Tiny
+  { bubbleCounts: [0, 0, 2, 2, 3, 3, 3], speeds: [1.7, 1.7, 1.7, 1.7, 1.7, 1.7, 1.7] },
+  // Level 15: 2 Large, 2 Medium, 4 Small, 4 Tiny (final challenge)
+  { bubbleCounts: [0, 0, 2, 2, 4, 4, 4], speeds: [1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8] },
+];
+
 export function useGameLogic({
   player,
   bubbles,
@@ -53,15 +87,6 @@ export function useGameLogic({
     }, 3000);
   };
 
-  // Level config
-  const levelConfigurations = [
-    { bubbleCounts: [2, 0, 0], speeds: [1, 1, 1] },
-    { bubbleCounts: [2, 2, 0], speeds: [1, 1, 1] },
-    { bubbleCounts: [2, 2, 2], speeds: [1, 1, 1] },
-    { bubbleCounts: [3, 2, 1], speeds: [1.1, 1.1, 1.1] },
-    { bubbleCounts: [3, 3, 2], speeds: [1.2, 1.2, 1.2] },
-    { bubbleCounts: [4, 3, 2], speeds: [1.3, 1.3, 1.3] },
-  ];
 
   const advanceToNextLevel = () => {
     currentLevel.value++;
@@ -104,12 +129,12 @@ export function useGameLogic({
         saveToLocalStorage('pangHighScore', highScore.value);
       }
     }
-    if (classicMode.value && bubbles.value.length === 0) {
-      advanceToNextLevel();
-    }
-    if (!classicMode.value && bubbles.value.length < 3 && Math.random() < 0.02) {
-      difficulty.value += 0.05;
-      addRandomBubbles(Math.min(Math.floor(difficulty.value), 3), difficulty.value);
+
+    if (!classicMode.value && bubbles.value.length === 0) {
+      // IMPROVEMENT: Increase difficulty increment for faster progression
+      difficulty.value += 1.0; // Whole number increments for more distinct difficulty changes
+      resetBubbles();
+      addRandomBubbles(Math.floor(difficulty.value)); // Use integer difficulty levels
     }
   };
 

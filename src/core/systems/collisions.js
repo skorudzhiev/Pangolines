@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import store from '../../store.js';
+import { bubbleSizes } from '../entities/bubbles.js';
 
 import useAudioManager from '../../composables/useAudioManager';
 
@@ -135,45 +136,40 @@ export function useCollisions(player, bubbles, projectiles) {
             }
           }
 
-          // Split the bubble using the splitBubble function from bubbles.js
-          const bubbleIndex = bubbles.value.indexOf(bubble);
-          if (bubbleIndex !== -1) {
-            // Store the bubble data before removing it
-            const hitBubble = {...bubbles.value[bubbleIndex]};
-            
-            // Remove the bubble first (this is important for clean state management)
-            bubbles.value.splice(bubbleIndex, 1);
-            
-            // If not the smallest size, split into two smaller bubbles
-            if (hitBubble.size < 2) {
-              const newSize = hitBubble.size + 1;
-              const bubbleSize = newSize === 1 ? 
-                { radius: 40, speed: 3, points: 20 } : 
-                { radius: 20, speed: 4, points: 30 };
-              
-              // Calculate speed based on the original bubble's speed multiplier
-              const speed = bubbleSize.speed * (hitBubble.velocityX > 0 ? 1 : -1);
-              const absSpeed = Math.abs(speed);
-              
-              // Create the two new bubbles
-              bubbles.value.push(
-                {
-                  x: hitBubble.x,
-                  y: hitBubble.y,
-                  radius: bubbleSize.radius,
-                  color: '#ff7e67',
-                  velocityX: -absSpeed,
-                  velocityY: -absSpeed * 1.5,
-                  gravity: 0.1,
-                  size: newSize,
-                  points: bubbleSize.points,
-                  minBounceVelocity: absSpeed * 0.8
-                },
-                {
-                  x: hitBubble.x,
-                  y: hitBubble.y,
-                  radius: bubbleSize.radius,
-                  color: '#ff7e67',
+          // Split the bubble using the new bubbleSizes logic
+const bubbleIndex = bubbles.value.indexOf(bubble);
+if (bubbleIndex !== -1) {
+  const hitBubble = { ...bubbles.value[bubbleIndex] };
+  bubbles.value.splice(bubbleIndex, 1);
+
+  // If not the smallest size, split into two smaller bubbles
+  if (hitBubble.size < bubbleSizes.length - 1) {
+    const newSize = hitBubble.size + 1;
+    const bubbleSize = bubbleSizes[newSize];
+    // Add some random variance to horizontal speed
+    const baseSpeed = bubbleSize.speed;
+    const speedVariance = 0.4;
+    const leftSpeed = -(baseSpeed + (Math.random() - 0.5) * speedVariance);
+    const rightSpeed = baseSpeed + (Math.random() - 0.5) * speedVariance;
+    const absSpeed = Math.abs(baseSpeed);
+    bubbles.value.push(
+      {
+        x: hitBubble.x,
+        y: hitBubble.y,
+        radius: bubbleSize.radius,
+        color: '#ff7e67',
+        velocityX: leftSpeed,
+        velocityY: -absSpeed * 1.5,
+        gravity: 0.1,
+        size: newSize,
+        points: bubbleSize.points,
+        minBounceVelocity: absSpeed * 0.8
+      },
+      {
+        x: hitBubble.x,
+        y: hitBubble.y,
+        radius: bubbleSize.radius,
+        color: '#ff7e67',
                   velocityX: absSpeed,
                   velocityY: -absSpeed * 1.5,
                   gravity: 0.1,
