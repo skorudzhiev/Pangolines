@@ -1,13 +1,13 @@
 import { ref } from 'vue';
 
 export const bubbleSizes = [
-  { radius: 120, speed: 0.8, points: 2 },   // Colossal
-  { radius: 100, speed: 1.0, points: 3 },   // Titanic
-  { radius: 80, speed: 1.2, points: 5 },    // Giant
-  { radius: 60, speed: 1.5, points: 10 },   // Large
-  { radius: 40, speed: 2, points: 20 },     // Medium
-  { radius: 25, speed: 2.7, points: 35 },   // Small
-  { radius: 14, speed: 3.5, points: 55 }    // Tiny
+  { radius: 120, speed: 1.3, points: 2 },   // Colossal
+  { radius: 100, speed: 1.6, points: 3 },   // Titanic
+  { radius: 80, speed: 1.9, points: 5 },    // Giant
+  { radius: 60, speed: 2.2, points: 10 },   // Large
+  { radius: 40, speed: 2.6, points: 20 },   // Medium
+  { radius: 25, speed: 3.2, points: 35 },   // Small
+  { radius: 14, speed: 4.0, points: 55 }    // Tiny
 ];
 
 export function useBubbles(gameWidth, gameHeight) {
@@ -155,41 +155,41 @@ export function useBubbles(gameWidth, gameHeight) {
   
   // Add random bubbles based on difficulty
   const addRandomBubbles = (count = 1, difficulty = 1) => {
-    difficultyMultiplier.value = difficulty;
+  // Gentler scaling for arcade mode
+  difficultyMultiplier.value = difficulty;
 
-    // Update speed multipliers for all bubble sizes
-    speedMultipliers.value = Array(bubbleSizes.length).fill(1).map((_, i) => 1 + (difficulty - 1) * 0.2 + i * 0.05);
+  // Make speed multipliers less aggressive
+  speedMultipliers.value = Array(bubbleSizes.length).fill(1).map((_, i) => 1 + (difficulty - 1) * 0.08 + i * 0.03);
 
-    for (let i = 0; i < count; i++) {
-      // Determine the largest size index available at this difficulty
-      // At diff 1: only size 0, diff 2: 0-1, diff 3: 0-2, etc.
-      const maxSizeIndex = Math.min(Math.floor(difficulty + 1), bubbleSizes.length - 1);
-      // Create a weighted array favoring smaller bubbles at higher difficulty
-      let weights = [];
-      for (let s = 0; s <= maxSizeIndex; s++) {
-        // Larger index = smaller bubble, so bias toward small at high difficulty
-        const base = Math.max(1, (s + 1) * (bubbleSizes.length - s));
-        // At higher difficulties, increase weight for smaller bubbles
-        const weight = base + (difficulty > 5 ? (bubbleSizes.length - s) * difficulty : 0);
-        weights.push(weight);
-      }
-      // Normalize weights and pick a size
-      const total = weights.reduce((a, b) => a + b, 0);
-      let rnd = Math.random() * total;
-      let chosenSize = 0;
-      for (let s = 0; s <= maxSizeIndex; s++) {
-        if (rnd < weights[s]) {
-          chosenSize = s;
-          break;
-        }
-        rnd -= weights[s];
-      }
-      const x = Math.random() * (gameWidth - 200) + 100;
-      const y = 100;
-      bubbles.value.push(createBubble(x, y, chosenSize));
+  for (let i = 0; i < count; i++) {
+    // At low difficulty, only largest bubbles; unlock smaller bubbles more slowly
+    const maxSizeIndex = Math.min(Math.floor((difficulty + 2) / 2), bubbleSizes.length - 1);
+    // Weighted array, but bias toward larger bubbles at low difficulty
+    let weights = [];
+    for (let s = 0; s <= maxSizeIndex; s++) {
+      // At low difficulty, much higher weight for largest
+      const base = Math.max(1, (maxSizeIndex + 1 - s) * 3);
+      // At higher difficulties, increase weight for smaller bubbles
+      const weight = base + (difficulty > 7 ? (bubbleSizes.length - s) * (difficulty - 6) : 0);
+      weights.push(weight);
     }
-  };
-  
+    // Normalize weights and pick a size
+    const total = weights.reduce((a, b) => a + b, 0);
+    let rnd = Math.random() * total;
+    let chosenSize = 0;
+    for (let s = 0; s <= maxSizeIndex; s++) {
+      if (rnd < weights[s]) {
+        chosenSize = s;
+        break;
+      }
+      rnd -= weights[s];
+    }
+    const x = Math.random() * (gameWidth - 200) + 100;
+    const y = 100;
+    bubbles.value.push(createBubble(x, y, chosenSize));
+  }
+}
+
   return {
     bubbles,
     updateBubbles,
