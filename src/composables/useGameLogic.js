@@ -1,5 +1,29 @@
 import { ref } from 'vue';
 
+// Level configurations for classic mode (example structure, adjust as needed)
+export const levelConfigurations = [
+  // Level 1: Easiest, just one large bubble
+  { bubbleCounts: [1, 0, 0], speeds: [0.9, 1, 1] },
+  // Level 2: Two large bubbles
+  { bubbleCounts: [2, 0, 0], speeds: [1, 1, 1] },
+  // Level 3: Two large, one medium
+  { bubbleCounts: [2, 1, 0], speeds: [1, 1, 1] },
+  // Level 4: Two large, two medium
+  { bubbleCounts: [2, 2, 0], speeds: [1.05, 1.05, 1] },
+  // Level 5: Two large, two medium, one small
+  { bubbleCounts: [2, 2, 1], speeds: [1.1, 1.1, 1.05] },
+  // Level 6: Three large, two medium, one small
+  { bubbleCounts: [3, 2, 1], speeds: [1.15, 1.15, 1.1] },
+  // Level 7: Three large, three medium, two small
+  { bubbleCounts: [3, 3, 2], speeds: [1.2, 1.2, 1.15] },
+  // Level 8: Four large, three medium, two small
+  { bubbleCounts: [4, 3, 2], speeds: [1.25, 1.25, 1.2] },
+  // Level 9: Four large, four medium, three small
+  { bubbleCounts: [4, 4, 3], speeds: [1.3, 1.3, 1.25] },
+  // Level 10: Five large, four medium, four small (final challenge)
+  { bubbleCounts: [5, 4, 4], speeds: [1.4, 1.35, 1.3] },
+];
+
 export function useGameLogic({
   player,
   bubbles,
@@ -53,15 +77,6 @@ export function useGameLogic({
     }, 3000);
   };
 
-  // Level config
-  const levelConfigurations = [
-    { bubbleCounts: [2, 0, 0], speeds: [1, 1, 1] },
-    { bubbleCounts: [2, 2, 0], speeds: [1, 1, 1] },
-    { bubbleCounts: [2, 2, 2], speeds: [1, 1, 1] },
-    { bubbleCounts: [3, 2, 1], speeds: [1.1, 1.1, 1.1] },
-    { bubbleCounts: [3, 3, 2], speeds: [1.2, 1.2, 1.2] },
-    { bubbleCounts: [4, 3, 2], speeds: [1.3, 1.3, 1.3] },
-  ];
 
   const advanceToNextLevel = () => {
     currentLevel.value++;

@@ -52,6 +52,7 @@
 
 <script setup>
 import styles from './Game.module.css';
+import { levelConfigurations } from '../composables/useGameLogic';
 import { onMounted, ref, watch } from 'vue';
 import MainMenu from './screens/MainMenu/MainMenu.vue';
 import StoreScreen from './screens/Store/StoreScreen.vue';
@@ -252,8 +253,8 @@ const startGame = (classic = false) => {
   resetPlayer();
   resetProjectiles();
   if (classic) {
-    const config = [2, 0, 0];
-    initializeLevel(config, [1, 1, 1]);
+    // Use the first level configuration for classic mode
+    initializeLevel(levelConfigurations[0].bubbleCounts, levelConfigurations[0].speeds);
   } else {
     resetBubbles();
   }
