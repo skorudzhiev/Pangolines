@@ -252,11 +252,17 @@ const startGame = (classic = false) => {
   resetGame();
   resetPlayer();
   resetProjectiles();
-  if (classic) {
+  // Reset difficulty for arcade mode
+  if (!classic) {
+    difficulty.value = 1; // EXPLICITLY reset difficulty to 1
+    console.log('DEBUGGING: Starting arcade mode, reset difficulty to:', difficulty.value);
+    resetBubbles();
+    console.log('DEBUGGING: After resetBubbles, bubble count:', bubbles.value.length);
+    // Initialize arcade mode with EXPLICITLY difficulty 1 configuration
+    addRandomBubbles(1); // Force difficulty 1
+  } else {
     // Use the first level configuration for classic mode
     initializeLevel(levelConfigurations[0].bubbleCounts, levelConfigurations[0].speeds);
-  } else {
-    resetBubbles();
   }
   // Play background music when game starts
   const { playMusic, musicEnabled, stopMusic } = useAudioManager();

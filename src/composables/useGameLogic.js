@@ -129,12 +129,13 @@ export function useGameLogic({
         saveToLocalStorage('pangHighScore', highScore.value);
       }
     }
-    // if (classicMode.value && bubbles.value.length === 0) {
-    //   advanceToNextLevel();
-    // }
-    if (!classicMode.value && bubbles.value.length < 3 && Math.random() < 0.02) {
-      difficulty.value += 0.05;
-      addRandomBubbles(Math.min(Math.floor(difficulty.value), 3), difficulty.value);
+
+    if (!classicMode.value && bubbles.value.length === 0) {
+      // IMPROVEMENT: Increase difficulty increment for faster progression
+      difficulty.value += 1.0; // Whole number increments for more distinct difficulty changes
+      console.log('Arcade mode: advancing to difficulty level', difficulty.value);
+      resetBubbles();
+      addRandomBubbles(Math.floor(difficulty.value)); // Use integer difficulty levels
     }
   };
 
