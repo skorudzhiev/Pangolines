@@ -255,10 +255,7 @@ const startGame = (classic = false) => {
   // Reset difficulty for arcade mode
   if (!classic) {
     difficulty.value = 1; // EXPLICITLY reset difficulty to 1
-    console.log('DEBUGGING: Starting arcade mode, reset difficulty to:', difficulty.value);
     resetBubbles();
-    console.log('DEBUGGING: After resetBubbles, bubble count:', bubbles.value.length);
-    // Initialize arcade mode with EXPLICITLY difficulty 1 configuration
     addRandomBubbles(1); // Force difficulty 1
   } else {
     // Use the first level configuration for classic mode
@@ -276,7 +273,6 @@ const startGame = (classic = false) => {
     }
   });
   gameRunning.value = true;
-  console.log('[DEBUG] Game started: gameRunning', gameRunning.value, 'gameOver', gameOver.value);
   gameContainer.value.focus();
   startGameLoop(() => {
     const ctx = gameCanvasRef.value?.gameCanvas?.getContext('2d');

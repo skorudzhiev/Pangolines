@@ -133,7 +133,6 @@ export function useGameLogic({
     if (!classicMode.value && bubbles.value.length === 0) {
       // IMPROVEMENT: Increase difficulty increment for faster progression
       difficulty.value += 1.0; // Whole number increments for more distinct difficulty changes
-      console.log('Arcade mode: advancing to difficulty level', difficulty.value);
       resetBubbles();
       addRandomBubbles(Math.floor(difficulty.value)); // Use integer difficulty levels
     }

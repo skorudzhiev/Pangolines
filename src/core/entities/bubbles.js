@@ -52,9 +52,7 @@ export function useBubbles(gameWidth, gameHeight) {
   
   // CHANGED: Default size is now Medium (4) instead of Colossal (0)
   const createBubble = (x, y, size = 4, velocityX = null) => {
-    console.log(`DEBUGGING: Creating bubble with size ${size} (${bubbleSizes[size].radius}px radius)`);
-    // Add stack trace for debugging
-    console.log('DEBUGGING: Bubble created at:', new Error().stack);
+    
     const bubbleSize = bubbleSizes[size];
     const speed = bubbleSize.speed * speedMultipliers.value[size];
     
@@ -76,7 +74,6 @@ export function useBubbles(gameWidth, gameHeight) {
     // Reset speed multipliers to default values for all sizes
     speedMultipliers.value = Array(bubbleSizes.length).fill(1);
 
-    console.log('DEBUGGING: Properly clearing bubbles array');
     bubbles.value = [];
   };
   
@@ -189,8 +186,6 @@ export function useBubbles(gameWidth, gameHeight) {
   
   // Add random bubbles based on difficulty
   const addRandomBubbles = (difficulty = 1) => {
-    console.log('DEBUGGING: addRandomBubbles called with difficulty:', difficulty);
-    console.log('DEBUGGING: Current bubble count before adding:', bubbles.value.length);
     
     // Safety check - ensure we have configurations
     if (!arcadeConfigurations || arcadeConfigurations.length === 0) {
@@ -217,22 +212,12 @@ export function useBubbles(gameWidth, gameHeight) {
       return; // Exit early
     }
     
-    console.log('DEBUGGING: Using arcade config at index:', safeIndex, 'config:', JSON.stringify(config));
     
     difficultyMultiplier.value = validDifficulty;
     
     // Ensure config.speed exists with a fallback
     const speedMultiplier = config.speed || 1.0;
     speedMultipliers.value = Array(bubbleSizes.length).fill(speedMultiplier);
-    
-    // List what we're going to spawn for each size (with safety checks)
-    if (config.bubbleCounts && Array.isArray(config.bubbleCounts)) {
-      config.bubbleCounts.forEach((count, idx) => {
-        if (count > 0 && idx < bubbleSizes.length) {
-          console.log(`DEBUGGING: Will spawn ${count} bubbles of size ${idx} (${bubbleSizes[idx].radius}px)`);
-        }
-      });
-    }
     
     // Process bubble spawn counts for each size (with safety checks)
     if (config.bubbleCounts && Array.isArray(config.bubbleCounts)) {
@@ -252,7 +237,6 @@ export function useBubbles(gameWidth, gameHeight) {
           try {
             const newBubble = createBubble(x, y, sizeIndex);
             bubbles.value.push(newBubble);
-            console.log(`DEBUGGING: Added bubble size ${sizeIndex}, radius ${newBubble.radius}px at (${x.toFixed(0)},${y})`);
           } catch (error) {
             console.error(`Error creating bubble of size ${sizeIndex}:`, error);
           }
@@ -260,10 +244,7 @@ export function useBubbles(gameWidth, gameHeight) {
       }
     } else {
       console.error('Invalid bubbleCounts configuration:', config.bubbleCounts);
-    }
-    
-    console.log('DEBUGGING: Final bubble count:', bubbles.value.length, 'bubbles:', bubbles.value.map(b => b.radius));
-
+    }    
   }
 
   return {
