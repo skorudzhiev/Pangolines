@@ -45,26 +45,85 @@ export function usePlayer(gameWidth, gameHeight) {
   };
   
   const drawPlayer = (ctx, debugMode = false) => {
-    ctx.fillStyle = player.value.color;
-    
-    // Draw player body
-    ctx.fillRect(
-      player.value.x,
-      player.value.y,
-      player.value.width,
-      player.value.height
-    );
-    
-    // Draw player head (slightly rounded)
+    const { x, y, width, height, color } = player.value;
+    // Body: rounded rectangle
+    ctx.save();
+    ctx.fillStyle = color;
+    const bodyRadius = 10;
     ctx.beginPath();
-    ctx.arc(
-      player.value.x + player.value.width / 2,
-      player.value.y,
-      player.value.width / 2.5,
-      0,
-      Math.PI * 2
-    );
+    ctx.moveTo(x + bodyRadius, y + height * 0.25);
+    ctx.lineTo(x + width - bodyRadius, y + height * 0.25);
+    ctx.quadraticCurveTo(x + width, y + height * 0.25, x + width, y + height * 0.25 + bodyRadius);
+    ctx.lineTo(x + width, y + height - bodyRadius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - bodyRadius, y + height);
+    ctx.lineTo(x + bodyRadius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - bodyRadius);
+    ctx.lineTo(x, y + height * 0.25 + bodyRadius);
+    ctx.quadraticCurveTo(x, y + height * 0.25, x + bodyRadius, y + height * 0.25);
+    ctx.closePath();
     ctx.fill();
+    ctx.restore();
+
+    // Head: circle
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x + width / 2, y + width / 2.5, width / 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffe066'; // Head color
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 6;
+    ctx.fill();
+    ctx.restore();
+
+    // Face: eyes and smile
+    ctx.save();
+    ctx.fillStyle = '#222';
+    // Eyes
+    const eyeY = y + width / 2.5 - width / 7;
+    ctx.beginPath();
+    ctx.arc(x + width / 2 - width / 7, eyeY, width / 18, 0, Math.PI * 2);
+    ctx.arc(x + width / 2 + width / 7, eyeY, width / 18, 0, Math.PI * 2);
+    ctx.fill();
+    // Smile
+    ctx.beginPath();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1.5;
+    ctx.arc(x + width / 2, y + width / 2.5 + width / 12, width / 8, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.stroke();
+    ctx.restore();
+
+    // Arms
+    ctx.save();
+    ctx.strokeStyle = '#ffe066';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    // Left arm
+    ctx.beginPath();
+    ctx.moveTo(x + width * 0.08, y + height * 0.38);
+    ctx.lineTo(x - width * 0.18, y + height * 0.55);
+    ctx.stroke();
+    // Right arm
+    ctx.beginPath();
+    ctx.moveTo(x + width * 0.92, y + height * 0.38);
+    ctx.lineTo(x + width * 1.18, y + height * 0.55);
+    ctx.stroke();
+    ctx.restore();
+
+    // Legs
+    ctx.save();
+    ctx.strokeStyle = '#ffe066';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    // Left leg
+    ctx.beginPath();
+    ctx.moveTo(x + width * 0.32, y + height);
+    ctx.lineTo(x + width * 0.18, y + height + height * 0.22);
+    ctx.stroke();
+    // Right leg
+    ctx.beginPath();
+    ctx.moveTo(x + width * 0.68, y + height);
+    ctx.lineTo(x + width * 0.82, y + height + height * 0.22);
+    ctx.stroke();
+    ctx.restore();
 
     // Debug: draw hitboxes
     if (debugMode) {
@@ -72,21 +131,10 @@ export function usePlayer(gameWidth, gameHeight) {
       ctx.strokeStyle = 'blue';
       ctx.lineWidth = 2;
       // Rectangle hitbox
-      ctx.strokeRect(
-        player.value.x,
-        player.value.y,
-        player.value.width,
-        player.value.height
-      );
+      ctx.strokeRect(x, y, width, height);
       // Head hitbox
       ctx.beginPath();
-      ctx.arc(
-        player.value.x + player.value.width / 2,
-        player.value.y,
-        player.value.width / 2.5,
-        0,
-        Math.PI * 2
-      );
+      ctx.arc(x + width / 2, y + width / 2.5, width / 2.5, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     }
