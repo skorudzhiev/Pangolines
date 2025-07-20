@@ -46,83 +46,143 @@ export function usePlayer(gameWidth, gameHeight) {
   
   const drawPlayer = (ctx, debugMode = false) => {
     const { x, y, width, height, color } = player.value;
-    // Body: rounded rectangle
+    
+    // Pangolin body: elongated oval with armored scales
     ctx.save();
-    ctx.fillStyle = color;
-    const bodyRadius = 10;
+    ctx.fillStyle = '#8B4513'; // Brown pangolin color
+    
+    // Main body - elongated oval
     ctx.beginPath();
-    ctx.moveTo(x + bodyRadius, y + height * 0.25);
-    ctx.lineTo(x + width - bodyRadius, y + height * 0.25);
-    ctx.quadraticCurveTo(x + width, y + height * 0.25, x + width, y + height * 0.25 + bodyRadius);
-    ctx.lineTo(x + width, y + height - bodyRadius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - bodyRadius, y + height);
-    ctx.lineTo(x + bodyRadius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - bodyRadius);
-    ctx.lineTo(x, y + height * 0.25 + bodyRadius);
-    ctx.quadraticCurveTo(x, y + height * 0.25, x + bodyRadius, y + height * 0.25);
-    ctx.closePath();
+    ctx.ellipse(x + width / 2, y + height * 0.6, width * 0.45, height * 0.35, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Draw armored scales on body
+    ctx.fillStyle = '#654321'; // Darker brown for scales
+    const scaleRows = 4;
+    const scalesPerRow = 5;
+    for (let row = 0; row < scaleRows; row++) {
+      for (let col = 0; col < scalesPerRow; col++) {
+        const scaleX = x + width * 0.15 + (col * width * 0.15);
+        const scaleY = y + height * 0.35 + (row * height * 0.15);
+        const scaleSize = width * 0.06;
+        
+        ctx.beginPath();
+        ctx.ellipse(scaleX, scaleY, scaleSize, scaleSize * 0.7, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+
+    // Pangolin head with elongated snout
+    ctx.save();
+    ctx.fillStyle = '#A0522D'; // Slightly lighter brown for head
+    
+    // Head base (rounded)
+    ctx.beginPath();
+    ctx.ellipse(x + width / 2, y + height * 0.2, width * 0.25, height * 0.15, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Elongated snout
+    ctx.beginPath();
+    ctx.ellipse(x + width / 2, y + height * 0.1, width * 0.15, height * 0.08, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    // Head: circle
+    // Eyes - small and beady
     ctx.save();
+    ctx.fillStyle = '#000';
+    const eyeY = y + height * 0.18;
+    const eyeSize = width * 0.025;
     ctx.beginPath();
-    ctx.arc(x + width / 2, y + width / 2.5, width / 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffe066'; // Head color
-    ctx.shadowColor = '#ffd700';
-    ctx.shadowBlur = 6;
+    ctx.arc(x + width * 0.42, eyeY, eyeSize, 0, Math.PI * 2);
+    ctx.arc(x + width * 0.58, eyeY, eyeSize, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    // Face: eyes and smile
+    // Nose - small dark spot at tip of snout
     ctx.save();
     ctx.fillStyle = '#222';
-    // Eyes
-    const eyeY = y + width / 2.5 - width / 7;
     ctx.beginPath();
-    ctx.arc(x + width / 2 - width / 7, eyeY, width / 18, 0, Math.PI * 2);
-    ctx.arc(x + width / 2 + width / 7, eyeY, width / 18, 0, Math.PI * 2);
+    ctx.arc(x + width / 2, y + height * 0.06, width * 0.015, 0, Math.PI * 2);
     ctx.fill();
-    // Smile
+    ctx.restore();
+
+    // Front legs with claws
+    ctx.save();
+    ctx.fillStyle = '#8B4513';
+    ctx.strokeStyle = '#654321';
+    ctx.lineWidth = 2;
+    
+    // Left front leg
     ctx.beginPath();
+    ctx.ellipse(x + width * 0.2, y + height * 0.75, width * 0.08, height * 0.12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    
+    // Right front leg
+    ctx.beginPath();
+    ctx.ellipse(x + width * 0.8, y + height * 0.75, width * 0.08, height * 0.12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    
+    // Claws
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 1.5;
-    ctx.arc(x + width / 2, y + width / 2.5 + width / 12, width / 8, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.lineCap = 'round';
+    
+    // Left claws
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.moveTo(x + width * 0.2 + (i - 1) * width * 0.02, y + height * 0.82);
+      ctx.lineTo(x + width * 0.2 + (i - 1) * width * 0.02, y + height * 0.88);
+      ctx.stroke();
+    }
+    
+    // Right claws
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.moveTo(x + width * 0.8 + (i - 1) * width * 0.02, y + height * 0.82);
+      ctx.lineTo(x + width * 0.8 + (i - 1) * width * 0.02, y + height * 0.88);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Back legs
+    ctx.save();
+    ctx.fillStyle = '#8B4513';
+    ctx.strokeStyle = '#654321';
+    ctx.lineWidth = 2;
+    
+    // Left back leg
+    ctx.beginPath();
+    ctx.ellipse(x + width * 0.3, y + height * 0.9, width * 0.08, height * 0.08, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    
+    // Right back leg
+    ctx.beginPath();
+    ctx.ellipse(x + width * 0.7, y + height * 0.9, width * 0.08, height * 0.08, 0, 0, Math.PI * 2);
+    ctx.fill();
     ctx.stroke();
     ctx.restore();
 
-    // Arms
+    // Tail - thick and armored
     ctx.save();
-    ctx.strokeStyle = '#ffe066';
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    // Left arm
-    ctx.beginPath();
-    ctx.moveTo(x + width * 0.08, y + height * 0.38);
-    ctx.lineTo(x - width * 0.18, y + height * 0.55);
-    ctx.stroke();
-    // Right arm
-    ctx.beginPath();
-    ctx.moveTo(x + width * 0.92, y + height * 0.38);
-    ctx.lineTo(x + width * 1.18, y + height * 0.55);
-    ctx.stroke();
-    ctx.restore();
-
-    // Legs
-    ctx.save();
-    ctx.strokeStyle = '#ffe066';
-    ctx.lineWidth = 5;
-    ctx.lineCap = 'round';
-    // Left leg
-    ctx.beginPath();
-    ctx.moveTo(x + width * 0.32, y + height);
-    ctx.lineTo(x + width * 0.18, y + height + height * 0.22);
-    ctx.stroke();
-    // Right leg
-    ctx.beginPath();
-    ctx.moveTo(x + width * 0.68, y + height);
-    ctx.lineTo(x + width * 0.82, y + height + height * 0.22);
-    ctx.stroke();
+    ctx.fillStyle = '#8B4513';
+    ctx.strokeStyle = '#654321';
+    ctx.lineWidth = 2;
+    
+    // Tail segments
+    for (let i = 0; i < 3; i++) {
+      const tailX = x + width / 2;
+      const tailY = y + height * 0.95 + (i * height * 0.08);
+      const tailWidth = width * (0.12 - i * 0.02);
+      
+      ctx.beginPath();
+      ctx.ellipse(tailX, tailY, tailWidth, height * 0.06, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
     ctx.restore();
 
     // Debug: draw hitboxes
