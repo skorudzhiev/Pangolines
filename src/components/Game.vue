@@ -264,7 +264,7 @@ const startGame = (classic = false) => {
   // Play background music when game starts
   const { playMusic, musicEnabled, stopMusic } = useAudioManager();
   if (musicEnabled.value) {
-    playMusic('/src/assets/audio/bgm.mp3');
+    playMusic('/sounds/bgm.mp3');
   }
   // Watch for gameOver to stop music
   watch(gameOver, (val) => {
