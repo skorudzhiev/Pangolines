@@ -4,10 +4,18 @@ import { useProjectiles } from '../core/systems/projectiles';
 import { useCollisions } from '../core/systems/collisions';
 import { useGameLoop } from '../core/managers/gameLoop';
 import { useInput } from '../composables/useInput';
+import { debugMode, processDebugInput } from '../composables/useDebugMode';
 
 export function useGameEngine(gameWidth, gameHeight) {
   // Input system
-  const { keysPressed } = useInput();
+  const { keysPressed, inputBuffer } = useInput();
+  
+  // Debug mode system handled via direct imports
+  
+  // Process debug input from buffer
+  const processInput = () => {
+    processDebugInput(inputBuffer);
+  };
 
   // Game engine systems
   const { startGameLoop, stopGameLoop } = useGameLoop();
@@ -18,6 +26,8 @@ export function useGameEngine(gameWidth, gameHeight) {
 
   return {
     keysPressed,
+    processInput,
+    debugMode,
     startGameLoop,
     stopGameLoop,
     player,

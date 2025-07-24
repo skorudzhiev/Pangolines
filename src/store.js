@@ -1,5 +1,6 @@
 import { reactive, watch } from "vue";
 import { saveToLocalStorage, loadFromLocalStorage } from "./utils/helpers";
+import { debugMode } from "./composables/useDebugMode";
 
 // Default power-up definitions (for validation and fallback)
 const defaultPowerUps = [
@@ -109,22 +110,22 @@ function validateLoadedStoreState(loaded) {
 const loaded = loadFromLocalStorage('pangStoreState', null);
 const { score, powerUps } = validateLoadedStoreState(loaded);
 
+
 const store = reactive({
   score,
   powerUps,
   purchasePowerUp(powerUpId) {
     const powerUp = this.powerUps.find((p) => p.id === powerUpId);
-    if (powerUp && this.score >= powerUp.cost && !powerUp.isPurchased) {
-      this.score -= powerUp.cost;
-      // Mutate in-place for reactivity
+    // In debug mode, allow free purchases
+    if (powerUp && !powerUp.isPurchased && (debugMode.value || this.score >= powerUp.cost)) {
+      if (!debugMode.value) {
+        this.score -= powerUp.cost;
+      }
       powerUp.isPurchased = true;
-      // Vue 3 reactivity: force update if needed
-      const idx = this.powerUps.findIndex(p => p.id === powerUpId);
-      if (idx !== -1) this.powerUps[idx] = { ...powerUp };
-      saveToLocalStorage('pangStoreState', { score: this.score, powerUps: this.powerUps });
-      return true; // Purchase successful
+      console.log(`Power-up '${powerUp.name}' purchased${debugMode ? ' (DEBUG MODE - FREE)' : ''}`);
+      return true;
     }
-    return false; // Purchase failed
+    return false;
   },
   resetPowerUps() {
     this.powerUps.forEach((powerUp) => {

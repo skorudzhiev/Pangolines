@@ -7,7 +7,7 @@
         <h3>{{ powerUp.name }}</h3>
         <p>{{ powerUp.description }}</p>
         <p>Cost: {{ powerUp.cost }}</p>
-        <UIButton @click="$emit('purchase', powerUp.id)" :disabled="score < powerUp.cost || powerUp.isPurchased">
+        <UIButton @click="$emit('purchase', powerUp.id)" :disabled="powerUp.isPurchased || (!debugMode && score < powerUp.cost)">
           {{ powerUp.isPurchased ? 'Purchased' : 'Buy Now' }}
         </UIButton>
       </div>
@@ -19,6 +19,7 @@
 <script setup>
 import styles from './StoreScreen.module.css';
 import UIButton from '../../ui/UIButton.vue'
+import { debugMode } from '../../../composables/useDebugMode';
 defineProps({ score: Number, powerUps: Array })
 defineEmits(['purchase', 'close-store'])
 </script>
