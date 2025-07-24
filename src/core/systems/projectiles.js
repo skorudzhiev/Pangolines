@@ -169,9 +169,12 @@ export function useProjectiles() {
           projectile.y -= projectile.speed;
         }
         
-        // Remove projectile if it reaches the edges of the screen
-        if (projectile.y <= -projectile.height || projectile.y >= gameHeight || 
-            projectile.x <= -projectile.width || projectile.x >= 800 + projectile.width) {
+        // Remove projectile if it reaches the top or goes out of bounds
+        if ((projectile.homing || projectile.piercing) &&
+            (projectile.y <= -projectile.height || projectile.y >= gameHeight || 
+             projectile.x <= -projectile.width || projectile.x >= 800 + projectile.width)) {
+          projectile.active = false;
+        } else if (!projectile.homing && !projectile.piercing && projectile.y <= 0) {
           projectile.active = false;
         }
       }
