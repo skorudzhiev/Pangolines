@@ -19,7 +19,7 @@
 <script setup>
 import styles from './StoreScreen.module.css';
 import UIButton from '../../ui/UIButton.vue'
-import { debugMode } from '../../../composables/useDebugMode';
+import { debugMode, isDebugAvailable } from '../../../composables/useDebugMode';
 defineProps({ score: Number, powerUps: Array })
 defineEmits(['purchase', 'close-store'])
 </script>

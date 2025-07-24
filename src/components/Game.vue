@@ -70,7 +70,7 @@ import { useGameLogic } from '../composables/useGameLogic';
 import { useGameEngine } from '../composables/useGameEngine';
 import { saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers.js';
 import { useParticles } from '../composables/useParticles';
-import { debugMode, processDebugInput, getDebugIndicator, toggleDebugMode } from '../composables/useDebugMode.js';
+import { debugMode, processDebugInput, getDebugIndicator, toggleDebugMode, isDebugAvailable } from '../composables/useDebugMode.js';
 import { useComboFloatingText } from '../composables/useComboFloatingText';
 import useAudioManager from '../composables/useAudioManager';
 

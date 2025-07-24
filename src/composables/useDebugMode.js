@@ -1,10 +1,12 @@
 import { ref } from 'vue';
 
 // Global debug state - persists across all components and screens
-export const debugMode = ref(false);
+export const debugMode = ref(import.meta.env.PROD ? false : false);
+export const isDebugAvailable = !import.meta.env.PROD;
 const debugToggleBuffer = ref([]);
 
 export function toggleDebugMode() {
+  if (import.meta.env.PROD) return; // No-op in production
   debugMode.value = !debugMode.value;
   console.log(`Debug mode ${debugMode.value ? 'enabled' : 'disabled'}`);
 }
