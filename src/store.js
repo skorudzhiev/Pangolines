@@ -31,6 +31,62 @@ const defaultPowerUps = [
     cost: 600,
     isPurchased: false,
   },
+  {
+    id: 'shield',
+    name: 'Shield',
+    description: 'Provides temporary protection from bubbles',
+    cost: 800,
+    isPurchased: false,
+  },
+  {
+    id: 'slowTime',
+    name: 'Slow Time',
+    description: 'Slows down bubble movement for easier targeting',
+    cost: 900,
+    isPurchased: false,
+  },
+  {
+    id: 'multiShot',
+    name: 'Multi-Shot',
+    description: 'Fires multiple projectiles in a spread pattern',
+    cost: 750,
+    isPurchased: false,
+  },
+  {
+    id: 'homingProjectiles',
+    name: 'Homing Projectiles',
+    description: 'Projectiles automatically seek nearby bubbles',
+    cost: 1000,
+    isPurchased: false,
+  },
+  {
+    id: 'rapidFire',
+    name: 'Rapid Fire',
+    description: 'Significantly increases firing rate',
+    cost: 650,
+    isPurchased: false,
+  },
+  {
+    id: 'piercing',
+    name: 'Piercing Shots',
+    description: 'Projectiles can pass through multiple bubbles',
+    cost: 850,
+    isPurchased: false,
+  },
+  {
+    id: 'magneticCollect',
+    name: 'Magnetic Collector',
+    description: 'Automatically attracts score pickups from distance',
+    cost: 550,
+    isPurchased: false,
+  },
+  {
+    id: 'extraLife',
+    name: 'Extra Life',
+    description: 'Grants one additional life when purchased',
+    cost: 1200,
+    isPurchased: false,
+  },
 ];
 
 function validateLoadedStoreState(loaded) {

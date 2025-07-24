@@ -36,10 +36,63 @@ You can enable a debug mode during gameplay to visualize collision areas:
 - Unique bubble configurations per level
 - Points awarded by bubble size
 
+## Power-Ups System
+
+The game features a comprehensive power-up system with 12 different upgrades that can be purchased using earned points. Power-ups are permanent once purchased and automatically activate their effects during gameplay.
+
+### Movement & Player Enhancements
+
+| Power-Up | Cost | Description | Activation |
+|----------|------|-------------|------------|
+| **Faster Movement** | 300 | Increases player movement speed from 5 to 8 units | Automatic |
+| **Shield** | 800 | Provides 5 seconds of protection from bubbles with pulsing cyan visual effect | Press **S** key |
+| **Extra Life** | 1200 | Grants one additional life (increases from 3 to 4 lives) | Automatic |
+
+### Projectile Enhancements
+
+| Power-Up | Cost | Description | Visual Effect |
+|----------|------|-------------|---------------|
+| **Larger Shots** | 500 | Increases projectile width from 4 to 8 pixels | Standard white |
+| **Double Projectiles** | 600 | Fires two projectiles simultaneously with slight offset | Standard white |
+| **Multi-Shot** | 750 | Fires 3 projectiles in a spread pattern | Yellow color |
+| **Rapid Fire** | 650 | Increases projectile speed and allows up to 3 simultaneous shots | Standard white |
+| **Piercing Shots** | 850 | Projectiles pass through up to 3 bubbles before disappearing | Magenta color |
+| **Homing Projectiles** | 1000 | Projectiles automatically seek nearby bubbles within 200px range | Cyan color |
+| **Explosive Projectiles** | 700 | Projectiles explode on impact for area damage | Standard white |
+
+### Special Abilities
+
+| Power-Up | Cost | Description | Activation |
+|----------|------|-------------|------------|
+| **Slow Time** | 900 | Slows down all game elements to 50% speed for 10 seconds | Press **T** key |
+| **Magnetic Collector** | 550 | Automatically attracts score pickups within 150px range | Automatic |
+
+### Power-Up Combinations
+
+Power-ups can be combined for enhanced effects:
+- **Multi-Shot + Piercing**: Each of the 3 projectiles can pierce through bubbles
+- **Homing + Explosive**: Seeking projectiles that explode on impact
+- **Rapid Fire + Larger Shots**: Fast, thick projectiles for maximum coverage
+- **Shield + Slow Time**: Ultimate defensive combination for difficult situations
+
+### Usage Tips
+
+- **Shield** and **Slow Time** are activated manually - save them for challenging moments
+- **Homing Projectiles** work best in crowded bubble scenarios
+- **Piercing Shots** are most effective against lines of bubbles
+- **Multi-Shot** provides excellent coverage for scattered bubbles
+- **Magnetic Collector** is invaluable for score optimization
+
 ## Controls
 
+### Basic Controls
 - **Left/Right Arrow Keys:** Move the player
 - **Spacebar:** Fire a projectile upward
+
+### Power-Up Activation
+- **S Key:** Activate Shield (if purchased)
+- **T Key:** Activate Slow Time (if purchased)
+- **D Key:** Toggle debug mode (development feature)
 
 ## Project Architecture
 
