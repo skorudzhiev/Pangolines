@@ -84,7 +84,7 @@ export function useCollisions(player, bubbles, projectiles) {
            projectile.active = false;
 
            // Play pop SFX
-           playSfx('/src/assets/audio/pop.mp3');
+           playSfx('/sounds/pop.mp3');
 
            const projectileIndex = projectiles.value.indexOf(projectile);
            projectiles.value.splice(projectileIndex, 1);

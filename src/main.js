@@ -11,7 +11,7 @@ app.mixin({
     if (typeof window !== 'undefined' && this.$root === this) {
       const { playMusic, musicEnabled } = useAudioManager();
       if (musicEnabled.value) {
-        playMusic('/src/assets/audio/bgm.mp3');
+        playMusic('/sounds/bgm.mp3');
       }
     }
   }
