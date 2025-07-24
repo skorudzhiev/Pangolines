@@ -1,4 +1,4 @@
-# Pang Game
+# Pangolines
 
 A modern Vue 3 reinterpretation of the classic arcade game Pang, featuring polished bubble-popping mechanics, responsive controls, retro visuals, and a robust, maintainable architecture.
 
