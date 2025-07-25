@@ -19,7 +19,7 @@ export function useGameEngine(gameWidth, gameHeight) {
 
   // Game engine systems
   const { startGameLoop, stopGameLoop } = useGameLoop();
-  const { player, updatePlayer, drawPlayer, resetPlayer } = usePlayer(gameWidth, gameHeight);
+  const { player, timeState, updatePlayer, drawPlayer, resetPlayer, activateSlowTime } = usePlayer(gameWidth, gameHeight);
   const { bubbles, updateBubbles, drawBubbles, resetBubbles, initializeLevel, addRandomBubbles } = useBubbles(gameWidth, gameHeight);
   const { projectiles, updateProjectiles, drawProjectiles, fireProjectile, resetProjectiles } = useProjectiles();
   const { gameOver, checkCollisions, resetGameState, onBubbleHit } = useCollisions(player, bubbles, projectiles);
@@ -31,9 +31,11 @@ export function useGameEngine(gameWidth, gameHeight) {
     startGameLoop,
     stopGameLoop,
     player,
+    timeState,
     updatePlayer,
     drawPlayer,
     resetPlayer,
+    activateSlowTime,
     bubbles,
     updateBubbles,
     drawBubbles,

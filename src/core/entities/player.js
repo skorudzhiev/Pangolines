@@ -78,10 +78,12 @@ export function usePlayer(gameWidth, gameHeight) {
   // Initialize extra life if purchased
   checkExtraLife();
 
-  // Direct keyboard event listener for shield activation
+  // Direct keyboard event listener for power-up activation
   const handleKeyDown = (e) => {
     if (e.code === 'KeyS') {
       activateShield();
+    } else if (e.code === 'KeyT') {
+      activateSlowTime();
     }
   };
 
@@ -99,7 +101,7 @@ export function usePlayer(gameWidth, gameHeight) {
     }
   });
   
-  const updatePlayer = (keysPressed) => {
+  const updatePlayer = (keysPressed, timeMultiplier = 1.0) => {
     // Update power-up timers
     if (player.value.shieldActive) {
       player.value.shieldDuration--;
@@ -121,12 +123,13 @@ export function usePlayer(gameWidth, gameHeight) {
     // Check for extra life power-up
     checkExtraLife();
     
-    // Move player left/right based on keys pressed
+    // Move player left/right based on keys pressed with time multiplier
+    const adjustedSpeed = player.value.speed * timeMultiplier;
     if (keysPressed.ArrowLeft) {
-      player.value.x = Math.max(0, player.value.x - player.value.speed);
+      player.value.x = Math.max(0, player.value.x - adjustedSpeed);
     }
     if (keysPressed.ArrowRight) {
-      player.value.x = Math.min(gameWidth - player.value.width, player.value.x + player.value.speed);
+      player.value.x = Math.min(gameWidth - player.value.width, player.value.x + adjustedSpeed);
     }
     
     // Note: Shield activation via S key is handled by direct event listener below

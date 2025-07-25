@@ -104,7 +104,7 @@ export function useProjectiles() {
     }
   };
   
-  const updateProjectiles = (gameHeight, bubbles = []) => {
+  const updateProjectiles = (gameHeight, bubbles = [], timeMultiplier = 1.0) => {
     // Update each projectile
     projectiles.value.forEach((projectile, index) => {
       if (projectile.active) {
@@ -154,12 +154,12 @@ export function useProjectiles() {
         
         // Update position based on velocity
         if (projectile.vx !== undefined && projectile.vy !== undefined) {
-          projectile.x += projectile.vx;
-          projectile.y += projectile.vy;
+          projectile.x += projectile.vx * timeMultiplier;
+          projectile.y += projectile.vy * timeMultiplier;
           
           // For homing projectiles, adjust height based on movement
           if (projectile.homing) {
-            projectile.height = Math.max(projectile.height, Math.abs(projectile.vy));
+            projectile.height = Math.max(projectile.height, Math.abs(projectile.vy * timeMultiplier));
           } else {
             projectile.height += Math.abs(projectile.vy);
           }

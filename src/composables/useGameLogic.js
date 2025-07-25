@@ -49,6 +49,7 @@ export function useGameLogic({
   highScore,
   floatingTexts,
   difficulty,
+  timeState,
   resetPlayer,
   resetProjectiles,
   resetBubbles,
@@ -106,14 +107,15 @@ export function useGameLogic({
     updatePlayer({
       ArrowLeft: keysPressed.ArrowLeft,
       ArrowRight: keysPressed.ArrowRight,
-      Space: keysPressed.Space
-    });
+      Space: keysPressed.Space,
+      KeyT: keysPressed.KeyT
+    }, timeState.value.timeMultiplier);
     if (keysPressed.Space && Date.now() - lastFireTime > fireCooldown) {
       fireProjectile(player.value.x + player.value.width / 2, player.value.y);
       lastFireTime = Date.now();
     }
-    updateProjectiles(768);
-    updateBubbles();
+    updateProjectiles(768, bubbles.value, timeState.value.timeMultiplier);
+    updateBubbles(timeState.value.timeMultiplier);
     checkCollisions(comboMultiplier.value);
     drawBubbles(ctx);
     drawProjectiles(ctx);

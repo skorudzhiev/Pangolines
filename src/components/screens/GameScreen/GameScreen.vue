@@ -1,12 +1,26 @@
 <template>
   <div :class="styles.gameUi">
-    <!-- Shield indicator -->
-    <div v-if="store.player && store.player.shieldActive" :class="styles.shieldIndicator">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <ellipse cx="16" cy="18" rx="10" ry="12" fill="#5ad5fc" stroke="#fff" stroke-width="2"/>
-        <path d="M16 6 L26 12 L16 28 L6 12 Z" fill="#2b8ab8" stroke="#fff" stroke-width="2"/>
-      </svg>
-      <span :class="styles.shieldText">Shield Active</span>
+    <!-- Power-up indicators -->
+    <div :class="styles.powerUpIndicators">
+      <!-- Shield indicator -->
+      <div v-if="store.player && store.player.shieldActive" :class="styles.shieldIndicator">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <ellipse cx="16" cy="18" rx="10" ry="12" fill="#5ad5fc" stroke="#fff" stroke-width="2"/>
+          <path d="M16 6 L26 12 L16 28 L6 12 Z" fill="#2b8ab8" stroke="#fff" stroke-width="2"/>
+        </svg>
+        <span :class="styles.shieldText">Shield Active</span>
+      </div>
+      
+      <!-- Slow Time indicator -->
+      <div v-if="timeState && timeState.slowTimeActive" :class="styles.slowTimeIndicator">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="12" fill="#8b5cf6" stroke="#fff" stroke-width="2"/>
+          <path d="M16 8 L16 16 L22 16" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="16" cy="16" r="3" fill="#fff"/>
+        </svg>
+        <span :class="styles.slowTimeText">Slow Time Active</span>
+        <span :class="styles.slowTimeDuration">{{ Math.ceil(timeState.slowTimeDuration / 60) }}s</span>
+      </div>
     </div>
     <div :class="styles.scoreContainer">
       <Score>Score: {{ score }}</Score>
@@ -34,7 +48,8 @@ defineProps({
   comboMultiplier: Number,
   classicMode: Boolean,
   currentLevel: Number,
-  difficulty: Number
+  difficulty: Number,
+  timeState: Object
 });
 
 const activePowerUps = computed(() => store.powerUps.filter(p => p.isPurchased));

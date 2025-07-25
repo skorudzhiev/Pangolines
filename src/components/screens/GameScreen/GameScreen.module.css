@@ -55,3 +55,59 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   border: 1px solid #555;
 }
+
+.powerUpIndicators {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+
+.shieldIndicator,
+.slowTimeIndicator {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: white;
+  font-family: sans-serif;
+  font-size: 14px;
+  gap: 8px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.shieldIndicator {
+  border-left: 3px solid #5ad5fc;
+}
+
+.slowTimeIndicator {
+  border-left: 3px solid #8b5cf6;
+}
+
+.shieldText,
+.slowTimeText {
+  font-weight: bold;
+}
+
+.slowTimeDuration {
+  background: rgba(139, 92, 246, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

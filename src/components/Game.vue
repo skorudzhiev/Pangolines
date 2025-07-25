@@ -39,6 +39,7 @@
         :classicMode="classicMode"
         :currentLevel="currentLevel"
         :difficulty="difficulty"
+        :timeState="timeState"
         :class="styles.gameUi"
       />
       <PauseScreen
@@ -158,7 +159,8 @@ const {
   gameOver,
   checkCollisions,
   resetGameState,
-  onBubbleHit
+  onBubbleHit,
+  timeState
 } = useGameEngine(gameWidth, gameHeight);
 
 // Combo floating text system
@@ -188,6 +190,7 @@ const {
   highScore,
   floatingTexts,
   difficulty,
+  timeState,
   resetPlayer,
   resetProjectiles,
   resetBubbles,
@@ -232,16 +235,6 @@ const onNextLevel = () => {
     advanceToNextLevel();
     pendingAdvance = false;
     gameRunning.value = true;
-    // Resume game loop exactly as in startGame
-    startGameLoop(() => {
-      const ctx = gameCanvasRef.value?.gameCanvas?.getContext('2d');
-      if (!ctx) return;
-      updateGame(ctx);
-      if (showParticles.value) {
-        updateParticles();
-        drawParticles(ctx);
-      }
-    });
   }
 };
 
@@ -320,15 +313,6 @@ const startGame = (classic = false) => {
   });
   gameRunning.value = true;
   gameContainer.value.focus();
-  startGameLoop(() => {
-    const ctx = gameCanvasRef.value?.gameCanvas?.getContext('2d');
-    if (!ctx) return;
-    updateGame(ctx);
-    if (showParticles.value) {
-      updateParticles();
-      drawParticles(ctx);
-    }
-  }); // updateGame is now the patched version with pause logic
 
 };
 
