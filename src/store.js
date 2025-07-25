@@ -123,10 +123,20 @@ const store = reactive({
     }
     return false;
   },
+  extraLifeJustUsed: false,
+  playerInvincibleUntil: 0,
   resetPowerUps() {
     this.powerUps.forEach((powerUp) => {
-      powerUp.isPurchased = false;
+      // Only reset extraLife if it was not just used (i.e., game over not triggered by extra life usage)
+      if (powerUp.id === 'extraLife') {
+        if (!this.extraLifeJustUsed) {
+          powerUp.isPurchased = false;
+        }
+      } else {
+        powerUp.isPurchased = false;
+      }
     });
+    this.extraLifeJustUsed = false;
     saveToLocalStorage('pangStoreState', { score: this.score, powerUps: this.powerUps });
   },
 });

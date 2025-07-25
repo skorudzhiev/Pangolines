@@ -20,6 +20,7 @@ export function useCollisions(player, bubbles, projectiles) {
   const resetGameState = () => {
     store.score = 0;
     gameOver.value = false;
+    if (store.extraLifeJustUsed !== undefined) store.extraLifeJustUsed = false;
   };
   
   const checkBubblePlayerCollision = (bubble, playerObj) => {
@@ -66,7 +67,22 @@ export function useCollisions(player, bubbles, projectiles) {
     // Check for collisions between bubbles and player
     for (const bubble of bubbles.value) {
       if (checkBubblePlayerCollision(bubble, player.value)) {
-        gameOver.value = true;
+        // Invincibility window after extra life
+        if (typeof performance !== 'undefined' && performance.now() < store.playerInvincibleUntil) {
+          continue; // Skip death logic if invincible
+        }
+        // Check for extra life power-up
+        const extraLife = store.powerUps.find(p => p.id === 'extraLife' && p.isPurchased);
+        if (extraLife) {
+          // Consume extra life and prevent game over
+          extraLife.isPurchased = false;
+          if (store.extraLifeJustUsed !== undefined) store.extraLifeJustUsed = true;
+          if (typeof performance !== 'undefined') store.playerInvincibleUntil = performance.now() + 1200;
+          playSfx && playSfx('/sounds/extra-life.mp3'); // Optional: play sound
+          // Optionally add visual feedback here
+        } else {
+          gameOver.value = true;
+        }
         // We want to continue checking other collisions so the player can still see
         // other bubble hits even if they're going to lose
       }
