@@ -68,9 +68,9 @@ const defaultPowerUps = [
     isPurchased: false,
   },
   {
-    id: 'piercing',
-    name: 'Piercing Shots',
-    description: 'Projectiles can pass through multiple bubbles',
+    id: 'anchorShot',
+    name: 'Anchor Shot',
+    description: 'Fires an anchor that remains until it is hit by a bubble',
     cost: 850,
     isPurchased: false,
   },

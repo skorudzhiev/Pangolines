@@ -20,12 +20,12 @@ export function useProjectiles() {
     const hasMultiShot = store.powerUps.find(p => p.id === 'multiShot' && p.isPurchased);
     const hasHoming = store.powerUps.find(p => p.id === 'homingProjectiles' && p.isPurchased);
     const hasRapidFire = store.powerUps.find(p => p.id === 'rapidFire' && p.isPurchased);
-    const hasPiercing = store.powerUps.find(p => p.id === 'piercing' && p.isPurchased);
+    const hasAnchorShot = store.powerUps.find(p => p.id === 'anchorShot' && p.isPurchased);
     
     const width = hasLargerShots ? 8 : 4;
     const speed = hasRapidFire ? 15 : 10;
     const isExplosive = !!hasExplosive;
-    const isPiercing = !!hasPiercing;
+    const isAnchorShot = !!hasAnchorShot;
     const isHoming = !!hasHoming;
     
     // Adjust max projectiles based on power-ups
@@ -50,13 +50,13 @@ export function useProjectiles() {
             color: hasMultiShot ? '#ffff00' : '#fff',
             active: true,
             explosive: isExplosive,
-            piercing: isPiercing,
+            anchorShot: isAnchorShot,
             homing: isHoming,
             angle: angle,
             vx: Math.sin(angle) * speed * 0.3,
             vy: -speed,
             target: null,
-            piercingHits: 0
+            anchorShotHits: 0
           });
         });
       } else {
@@ -67,16 +67,16 @@ export function useProjectiles() {
           width,
           height: 0,
           speed,
-          color: isHoming ? '#00ffff' : (isPiercing ? '#ff00ff' : '#fff'),
+          color: isHoming ? '#00ffff' : (isAnchorShot ? '#ff00ff' : '#fff'),
           active: true,
           explosive: isExplosive,
-          piercing: isPiercing,
+          anchorShot: isAnchorShot,
           homing: isHoming,
           angle: 0,
           vx: 0,
           vy: -speed,
           target: null,
-          piercingHits: 0
+          anchorShotHits: 0
         });
         
         // Double shot
@@ -88,16 +88,16 @@ export function useProjectiles() {
             width,
             height: 0,
             speed,
-            color: isHoming ? '#00ffff' : (isPiercing ? '#ff00ff' : '#fff'),
+            color: isHoming ? '#00ffff' : (isAnchorShot ? '#ff00ff' : '#fff'),
             active: true,
             explosive: isExplosive,
-            piercing: isPiercing,
+            anchorShot: isAnchorShot,
             homing: isHoming,
             angle: 0,
             vx: 0,
             vy: -speed,
             target: null,
-            piercingHits: 0
+            anchorShotHits: 0
           });
         }
       }
@@ -170,11 +170,11 @@ export function useProjectiles() {
         }
         
         // Remove projectile if it reaches the top or goes out of bounds
-        if ((projectile.homing || projectile.piercing) &&
+        if ((projectile.homing || projectile.anchorShot) &&
             (projectile.y <= -projectile.height || projectile.y >= gameHeight || 
              projectile.x <= -projectile.width || projectile.x >= 800 + projectile.width)) {
           projectile.active = false;
-        } else if (!projectile.homing && !projectile.piercing && projectile.y <= 0) {
+        } else if (!projectile.homing && !projectile.anchorShot && projectile.y <= 0) {
           projectile.active = false;
         }
       }
@@ -217,28 +217,12 @@ export function useProjectiles() {
     }
   };
   
-  // Handle projectile collision with bubble
-  const handleProjectileCollision = (projectile, bubble) => {
-    if (projectile.piercing) {
-      // Piercing projectiles can hit multiple bubbles
-      projectile.piercingHits++;
-      
-      // Remove piercing projectile after hitting 3 bubbles or if it's a small bubble
-      if (projectile.piercingHits >= 3 || bubble.size <= 20) {
-        projectile.active = false;
-      }
-    } else {
-      // Normal projectiles are removed on hit
-      projectile.active = false;
-    }
-  };
-  
   // Get collision info for external systems
   const getProjectileCollisionInfo = (projectile) => {
     return {
-      isPiercing: projectile.piercing || false,
+      isPiercing: projectile.anchorShot || false,
       isExplosive: projectile.explosive || false,
-      piercingHits: projectile.piercingHits || 0
+      anchorShotHits: projectile.anchorShotHits || 0
     };
   };
   
@@ -255,7 +239,19 @@ export function useProjectiles() {
     removeProjectile,
     resetProjectiles,
     setMaxProjectiles,
-    handleProjectileCollision,
     getProjectileCollisionInfo
   };
 }
+
+// Handle projectile collision with bubble (for import in collisions.js)
+export function handleProjectileCollision(projectile, bubble) {
+  if (projectile.anchorShot) {
+    projectile.anchorShotHits++;
+    if (projectile.anchorShotHits >= 3 || bubble.size <= 20) {
+      projectile.active = false;
+    }
+  } else {
+    projectile.active = false;
+  }
+}
+

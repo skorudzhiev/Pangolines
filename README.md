@@ -56,7 +56,7 @@ The game features a comprehensive power-up system with 12 different upgrades tha
 | **Double Projectiles** | 600 | Fires two projectiles simultaneously with slight offset | Standard white |
 | **Multi-Shot** | 750 | Fires 3 projectiles in a spread pattern | Yellow color |
 | **Rapid Fire** | 650 | Increases projectile speed and allows up to 3 simultaneous shots | Standard white |
-| **Piercing Shots** | 850 | Projectiles pass through up to 3 bubbles before disappearing | Magenta color |
+| **Anchoring Shots** | 850 | Fires an anchor that remains until it is hit by a bubble | Magenta color |
 | **Homing Projectiles** | 1000 | Projectiles automatically seek nearby bubbles within 200px range | Cyan color |
 | **Explosive Projectiles** | 700 | Projectiles explode on impact for area damage | Standard white |
 
@@ -65,12 +65,11 @@ The game features a comprehensive power-up system with 12 different upgrades tha
 | Power-Up | Cost | Description | Activation |
 |----------|------|-------------|------------|
 | **Slow Time** | 900 | Slows down all game elements to 50% speed for 10 seconds | Press **T** key |
-| **Magnetic Collector** | 550 | Automatically attracts score pickups within 150px range | Automatic |
 
 ### Power-Up Combinations
 
 Power-ups can be combined for enhanced effects:
-- **Multi-Shot + Piercing**: Each of the 3 projectiles can pierce through bubbles
+- **Multi-Shot + Anchoring**: Each of the 3 projectiles can anchor until hit by a bubble
 - **Homing + Explosive**: Seeking projectiles that explode on impact
 - **Rapid Fire + Larger Shots**: Fast, thick projectiles for maximum coverage
 - **Shield + Slow Time**: Ultimate defensive combination for difficult situations
@@ -79,9 +78,8 @@ Power-ups can be combined for enhanced effects:
 
 - **Shield** and **Slow Time** are activated manually - save them for challenging moments
 - **Homing Projectiles** work best in crowded bubble scenarios
-- **Piercing Shots** are most effective against lines of bubbles
+- **Anchoring Shots** are most effective as an anchor until hit by a bubble
 - **Multi-Shot** provides excellent coverage for scattered bubbles
-- **Magnetic Collector** is invaluable for score optimization
 
 ## Controls
 

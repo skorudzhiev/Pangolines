@@ -3,6 +3,7 @@ import store from '../../store.js';
 import { bubbleSizes } from '../entities/bubbles.js';
 
 import useAudioManager from '../../composables/useAudioManager';
+import { handleProjectileCollision } from './projectiles.js';
 
 export function useCollisions(player, bubbles, projectiles) {
   // Use store.score as the single source of truth for score
@@ -60,6 +61,11 @@ export function useCollisions(player, bubbles, projectiles) {
       return false;
     }
     
+    // Anchor shots can hit up to 3 bubbles before disappearing
+    if (projectile.anchorShot && projectile.anchorShotHits >= 3) {
+      return false;
+    }
+    
     return true;
   };
   
@@ -96,14 +102,19 @@ export function useCollisions(player, bubbles, projectiles) {
         const bubble = bubbles.value[i];
         
         if (checkBubbleProjectileCollision(bubble, projectile)) {
-           // Remove the projectile
-           projectile.active = false;
+           // Handle projectile collision (including anchorShot logic)
+           handleProjectileCollision(projectile, bubble);
 
            // Play pop SFX
            playSfx('/sounds/pop.mp3');
 
-           const projectileIndex = projectiles.value.indexOf(projectile);
-           projectiles.value.splice(projectileIndex, 1);
+           // Only remove the projectile from the array if it's now inactive
+           if (!projectile.active) {
+             const projectileIndex = projectiles.value.indexOf(projectile);
+             if (projectileIndex !== -1) {
+               projectiles.value.splice(projectileIndex, 1);
+             }
+           }
           
           // Add score - with combo multiplier applied
           const pointsEarned = Math.round(bubble.points * comboMultiplier);
