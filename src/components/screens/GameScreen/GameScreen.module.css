@@ -1,104 +1,123 @@
-/* Styles moved from GameScreen.vue */
+/* Game UI Styles */
 .gameUi {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: white;
+  font-family: 'Arial', sans-serif;
+}
+
+.scoreContainer {
   position: absolute;
   top: 20px;
   right: 20px;
   text-align: right;
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 15px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  font-family: sans-serif;
-  z-index: 100;
-}
-.scoreContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-.scoreDisplay, .levelDisplay, .difficultyDisplay {
-  font-size: 24px;
-  margin: 5px 0;
-}
-.comboDisplay {
-  opacity: 0;
-  transition: opacity 0.3s;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-.comboDisplayActive {
-  opacity: 1;
-}
-.comboCounter {
-  font-size: 18px;
-  color: #fcd34d;
-}
-.comboMultiplier {
-  font-size: 16px;
-  color: #f87171;
-}
-.powerupChips {
-  display: flex;
-  gap: 8px;
-  margin: 4px 0 0 0;
-}
-.powerupChip {
-  background: #333;
-  color: #ffe066;
-  font-size: 0.85em;
-  padding: 2px 10px;
-  border-radius: 12px;
+  z-index: 10;
+  font-size: 20px;
   font-weight: bold;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  border: 1px solid #555;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 .powerUpIndicators {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 100px; /* Move well below the score */
+  right: 20px;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 100;
+  flex-direction: column; /* Stack indicators vertically */
+  align-items: flex-end; /* Align to the right */
+  gap: 8px; /* Reduce space between indicators */
+  z-index: 20;
 }
 
-.shieldIndicator,
-.slowTimeIndicator {
+.shieldIndicator, .slowTimeIndicator {
   display: flex;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: white;
-  font-family: sans-serif;
+  background: rgba(30, 60, 90, 0.8);
+  border-radius: 12px;
+  padding: 3px 10px 3px 6px;
+  box-shadow: 0 2px 8px #00000033;
   font-size: 14px;
-  gap: 8px;
-  animation: fadeIn 0.3s ease-in-out;
 }
 
 .shieldIndicator {
-  border-left: 3px solid #5ad5fc;
+  border: 2px solid #5ad5fc;
 }
 
 .slowTimeIndicator {
-  border-left: 3px solid #8b5cf6;
+  border: 2px solid #8b5cf6;
 }
 
-.shieldText,
+.shieldIndicator svg, .slowTimeIndicator svg {
+  margin-right: 8px;
+}
+
+.shieldText {
+  color: #5ad5fc;
+  font-weight: 600;
+  font-size: 14px;
+}
+
 .slowTimeText {
-  font-weight: bold;
+  color: #a78bfa;
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 6px;
 }
 
 .slowTimeDuration {
-  background: rgba(139, 92, 246, 0.3);
-  padding: 2px 6px;
-  border-radius: 4px;
+  color: #ffffff;
+  font-weight: bold;
+  background-color: #8b5cf6;
+  padding: 1px 6px;
+  border-radius: 8px;
   font-size: 12px;
-  margin-left: 4px;
+}
+
+.levelDisplay, .difficultyDisplay {
+  position: absolute;
+  bottom: 20px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.levelDisplay {
+    left: 20px;
+}
+
+.difficultyDisplay {
+    right: 20px;
+}
+
+.comboDisplay {
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s, transform 0.3s;
+  height: 18px; /* Reserve space */
+}
+
+.comboDisplayActive {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.comboCounter {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffc107;
+  animation: combo-pop 0.3s ease-out;
+}
+
+.comboMultiplier {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #ffeb3b;
+}
+
+@keyframes combo-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 @keyframes fadeIn {
