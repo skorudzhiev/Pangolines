@@ -16,6 +16,7 @@
       <PowerUpIndicator v-if="gameRunning" />
       <MainMenu v-if="!gameRunning && !gameOver.value && !showStore"
         :highScore="highScore"
+        :powerUps="store.powerUps"
         @start-game="startGame"
         @show-store="showStore = true"
       />
