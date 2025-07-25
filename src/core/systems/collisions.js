@@ -73,6 +73,11 @@ export function useCollisions(player, bubbles, projectiles) {
     // Check for collisions between bubbles and player
     for (const bubble of bubbles.value) {
       if (checkBubblePlayerCollision(bubble, player.value)) {
+        // Skip all collision logic if shield is active (player is invincible)
+        if (player.value.shieldActive) {
+          continue; // Skip death logic entirely while shield is active
+        }
+        
         // Invincibility window after extra life
         if (typeof performance !== 'undefined' && performance.now() < store.playerInvincibleUntil) {
           continue; // Skip death logic if invincible

@@ -10,7 +10,9 @@ export function useInput() {
     ArrowLeft: false,
     ArrowRight: false,
     Space: false,
-    // Add more keys as needed
+    KeyS: false,
+    KeyT: false,
+    KeyD: false,
   });
 
   // Input buffer for smoother gameplay (future: can expand)

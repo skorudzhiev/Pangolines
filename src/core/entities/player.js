@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import store from '../../store.js';
 
 export function usePlayer(gameWidth, gameHeight) {
@@ -50,6 +50,12 @@ export function usePlayer(gameWidth, gameHeight) {
     if (hasShield && !player.value.shieldActive) {
       player.value.shieldActive = true;
       player.value.shieldDuration = 300; // 5 seconds at 60fps
+      if (hasShield) hasShield.isPurchased = false; // Consume shield
+      if (typeof window !== 'undefined') {
+        const audio = new Audio('/audio/shield_activate.mp3');
+        audio.volume = 0.5;
+        audio.play();
+      }
     }
   };
   
@@ -71,6 +77,27 @@ export function usePlayer(gameWidth, gameHeight) {
   
   // Initialize extra life if purchased
   checkExtraLife();
+
+  // Direct keyboard event listener for shield activation
+  const handleKeyDown = (e) => {
+    if (e.code === 'KeyS') {
+      activateShield();
+    }
+  };
+
+  // Set up keyboard listener when component mounts
+  onMounted(() => {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+  });
+
+  // Clean up listener when component unmounts
+  onUnmounted(() => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('keydown', handleKeyDown);
+    }
+  });
   
   const updatePlayer = (keysPressed) => {
     // Update power-up timers
@@ -102,10 +129,7 @@ export function usePlayer(gameWidth, gameHeight) {
       player.value.x = Math.min(gameWidth - player.value.width, player.value.x + player.value.speed);
     }
     
-    // Activate power-ups with key presses (if available)
-    if (keysPressed.KeyS) { // S for Shield
-      activateShield();
-    }
+    // Note: Shield activation via S key is handled by direct event listener below
     if (keysPressed.KeyT) { // T for Time slow
       activateSlowTime();
     }
