@@ -1,7 +1,13 @@
 <template>
   <div :class="styles.guideContainer">
     <div :class="styles.header">
-      <h2>Power-Ups Guide</h2>
+      <div :class="styles.headerTop">
+        <UIButton :class="styles.headerBackButton" @click="$emit('back')">
+          ← Back to Menu
+        </UIButton>
+        <h2>Power-Ups Guide</h2>
+        <div></div> <!-- Spacer for centering -->
+      </div>
       <p :class="styles.subtitle">Master the art of bubble destruction with strategic power-up combinations</p>
     </div>
     
