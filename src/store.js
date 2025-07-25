@@ -74,13 +74,7 @@ const defaultPowerUps = [
     cost: 850,
     isPurchased: false,
   },
-  {
-    id: 'magneticCollect',
-    name: 'Magnetic Collector',
-    description: 'Automatically attracts score pickups from distance',
-    cost: 550,
-    isPurchased: false,
-  },
+
   {
     id: 'extraLife',
     name: 'Extra Life',
@@ -97,7 +91,9 @@ function validateLoadedStoreState(loaded) {
     score = loaded.score;
   }
   // Validate powerUps
-  let powerUps = defaultPowerUps.map(def => {
+  let powerUps = defaultPowerUps
+  .filter(def => def.id !== 'magneticCollect')
+  .map(def => {
     const match = loaded?.powerUps?.find(p => p.id === def.id);
     return {
       ...def,
