@@ -129,19 +129,11 @@
         </div>
       </div>
     </div>
-
-    <div :class="styles.footer">
-      <div :class="styles.storeInfo">
-        <h4>💰 How to Purchase</h4>
-        <p>Earn points by popping bubbles and clearing levels. Visit the <strong>Store</strong> from the main menu to purchase power-ups with your earned points.</p>
-      </div>
-      <UIButton :class="styles.backButton" @click="$emit('back')">Back to Main Menu</UIButton>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import styles from './PowerUpsGuideScreen.module.css';
 import UIButton from '../../ui/UIButton.vue';
 
@@ -150,6 +142,12 @@ const props = defineProps({
     type: Array,
     default: () => []
   }
+});
+
+// Debug logging
+onMounted(() => {
+  console.log('Power-Ups Guide - Received power-ups:', props.powerUps);
+  console.log('Power-Ups Guide - Count:', props.powerUps.length);
 });
 
 defineEmits(['back']);
