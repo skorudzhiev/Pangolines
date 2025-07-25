@@ -110,43 +110,43 @@ export function useProjectiles() {
       if (projectile.active) {
         // Homing behavior
         if (projectile.homing && bubbles.length > 0) {
-          // Find nearest bubble if no target or target is inactive
-          if (!projectile.target || !projectile.target.active) {
-            let nearestBubble = null;
-            let nearestDistance = Infinity;
-            
-            bubbles.forEach(bubble => {
-              if (bubble.active) {
+          // Ensure bubbles have active property (default to true if missing)
+          const validBubbles = bubbles.filter(bubble => bubble.active !== false);
+          
+          if (validBubbles.length > 0) {
+            // Find nearest bubble if no target or target is inactive
+            if (!projectile.target || projectile.target.active === false) {
+              let nearestBubble = null;
+              let nearestDistance = Infinity;
+              
+              validBubbles.forEach(bubble => {
                 const dx = bubble.x - projectile.x;
                 const dy = bubble.y - projectile.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (distance < nearestDistance && distance < 200) { // Homing range
+                if (distance < nearestDistance) {
                   nearestDistance = distance;
                   nearestBubble = bubble;
                 }
-              }
-            });
-            
-            projectile.target = nearestBubble;
-          }
-          
-          // Steer towards target
-          if (projectile.target && projectile.target.active) {
-            const dx = projectile.target.x - projectile.x;
-            const dy = projectile.target.y - projectile.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance > 0) {
-              const homingStrength = 0.3;
-              projectile.vx += (dx / distance) * homingStrength;
-              projectile.vy += (dy / distance) * homingStrength;
+              });
               
-              // Normalize velocity to maintain speed
-              const currentSpeed = Math.sqrt(projectile.vx * projectile.vx + projectile.vy * projectile.vy);
-              if (currentSpeed > 0) {
-                projectile.vx = (projectile.vx / currentSpeed) * projectile.speed;
-                projectile.vy = (projectile.vy / currentSpeed) * projectile.speed;
+              projectile.target = nearestBubble;
+            }
+            
+            // Steer towards target
+            if (projectile.target && projectile.target.active !== false) {
+              const dx = projectile.target.x - projectile.x;
+              const dy = projectile.target.y - projectile.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              if (distance > 0) {
+                // Calculate direct vector to target
+                const targetVx = (dx / distance) * projectile.speed;
+                const targetVy = (dy / distance) * projectile.speed;
+                
+                // Apply stronger steering force for visible homing
+                projectile.vx = targetVx;
+                projectile.vy = targetVy;
               }
             }
           }
@@ -186,13 +186,52 @@ export function useProjectiles() {
   const drawProjectiles = (ctx, debugMode = false) => {
     projectiles.value.forEach(projectile => {
       if (projectile.active) {
-        ctx.fillStyle = projectile.color;
-        ctx.fillRect(
-          projectile.x,
-          projectile.y,
-          projectile.width,
-          projectile.height
-        );
+        if (projectile.homing) {
+          // Draw targeting line to locked bubble
+          if (projectile.target && projectile.target.active) {
+            ctx.save();
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.7;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(projectile.x + projectile.width/2, projectile.y + projectile.height/2);
+            ctx.lineTo(projectile.target.x + projectile.target.width/2, projectile.target.y + projectile.target.height/2);
+            ctx.stroke();
+            ctx.restore();
+          }
+          
+          // Homing projectiles get a bright cyan color with glow effect
+          ctx.fillStyle = '#00ffff';
+          ctx.shadowColor = '#00ffff';
+          ctx.shadowBlur = 8;
+          ctx.fillRect(
+            projectile.x,
+            projectile.y,
+            projectile.width,
+            projectile.height
+          );
+          ctx.shadowBlur = 0;
+          
+          // Add a trail effect
+          ctx.fillStyle = '#0088ff';
+          ctx.globalAlpha = 0.6;
+          ctx.fillRect(
+            projectile.x - projectile.vx * 0.5,
+            projectile.y - projectile.vy * 0.5,
+            projectile.width * 0.8,
+            projectile.height * 0.8
+          );
+          ctx.globalAlpha = 1.0;
+        } else {
+          ctx.fillStyle = projectile.color;
+          ctx.fillRect(
+            projectile.x,
+            projectile.y,
+            projectile.width,
+            projectile.height
+          );
+        }
         // Debug: draw hitbox
         if (debugMode) {
           ctx.save();
