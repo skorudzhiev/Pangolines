@@ -9,6 +9,9 @@
         <div></div> <!-- Spacer for centering -->
       </div>
       <p :class="styles.subtitle">Master the art of bubble destruction with strategic power-up combinations</p>
+      <div :class="styles.howToUseNote">
+        <strong>How to Use:</strong> Activate <span style='color:#4FC3F7'>Shield</span> in-game with the <kbd>S</kbd> key and <span style='color:#FFD54F'>Slow Time</span> with the <kbd>T</kbd> key after purchase.
+      </div>
     </div>
     
     <div :class="styles.content">
@@ -33,7 +36,11 @@
               <h4>{{ powerUp.name }}</h4>
               <span :class="[styles.cost, getCostClass(powerUp.cost)]">{{ powerUp.cost }} pts</span>
             </div>
-            <p :class="styles.description">{{ powerUp.description }}</p>
+            <p :class="styles.description">
+  {{ powerUp.description }}
+  <span v-if="powerUp.id === 'shield'" :class="styles.activationHint">(Activate with <kbd>S</kbd>)</span>
+  <span v-else-if="powerUp.id === 'slowTime'" :class="styles.activationHint">(Activate with <kbd>T</kbd>)</span>
+</p>
             <div :class="styles.tags">
               <span v-for="tag in getPowerUpTags(powerUp)" :key="tag" :class="styles.tag">
                 {{ tag }}
@@ -53,7 +60,11 @@
               <h4>{{ powerUp.name }}</h4>
               <span :class="[styles.cost, getCostClass(powerUp.cost)]">{{ powerUp.cost }} pts</span>
             </div>
-            <p :class="styles.description">{{ powerUp.description }}</p>
+            <p :class="styles.description">
+  {{ powerUp.description }}
+  <span v-if="powerUp.id === 'shield'" :class="styles.activationHint">(Activate with <kbd>S</kbd>)</span>
+  <span v-else-if="powerUp.id === 'slowTime'" :class="styles.activationHint">(Activate with <kbd>T</kbd>)</span>
+</p>
             <div :class="styles.effectiveness">
               <strong>Best for:</strong> {{ getEffectiveness(powerUp.id) }}
             </div>
@@ -71,7 +82,11 @@
               <h4>{{ powerUp.name }}</h4>
               <span :class="[styles.cost, getCostClass(powerUp.cost)]">{{ powerUp.cost }} pts</span>
             </div>
-            <p :class="styles.description">{{ powerUp.description }}</p>
+            <p :class="styles.description">
+  {{ powerUp.description }}
+  <span v-if="powerUp.id === 'shield'" :class="styles.activationHint">(Activate with <kbd>S</kbd>)</span>
+  <span v-else-if="powerUp.id === 'slowTime'" :class="styles.activationHint">(Activate with <kbd>T</kbd>)</span>
+</p>
             <div :class="styles.effectiveness">
               <strong>Best for:</strong> {{ getEffectiveness(powerUp.id) }}
             </div>
@@ -89,7 +104,11 @@
               <h4>{{ powerUp.name }}</h4>
               <span :class="[styles.cost, getCostClass(powerUp.cost)]">{{ powerUp.cost }} pts</span>
             </div>
-            <p :class="styles.description">{{ powerUp.description }}</p>
+            <p :class="styles.description">
+  {{ powerUp.description }}
+  <span v-if="powerUp.id === 'shield'" :class="styles.activationHint">(Activate with <kbd>S</kbd>)</span>
+  <span v-else-if="powerUp.id === 'slowTime'" :class="styles.activationHint">(Activate with <kbd>T</kbd>)</span>
+</p>
             <div :class="styles.effectiveness">
               <strong>Best for:</strong> {{ getEffectiveness(powerUp.id) }}
             </div>

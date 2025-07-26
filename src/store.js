@@ -35,14 +35,14 @@ const defaultPowerUps = [
   {
     id: 'shield',
     name: 'Shield',
-    description: 'Provides temporary protection from bubbles',
+    description: 'Provides temporary protection from bubbles. Activate in-game with the S key.',
     cost: 900,
     isPurchased: false,
   },
   {
     id: 'slowTime',
     name: 'Slow Time',
-    description: 'Slows down bubble movement for easier targeting',
+    description: 'Slows down bubble movement for easier targeting. Activate in-game with the T key.',
     cost: 950,
     isPurchased: false,
   },
