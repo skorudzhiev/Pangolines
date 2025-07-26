@@ -2,6 +2,8 @@
 
 A modern Vue 3 reinterpretation of the classic arcade game Pang, featuring polished bubble-popping mechanics, responsive controls, retro visuals, and a robust, maintainable architecture.
 
+[Live Demo](https://pangolines.vercel.app/)
+
 ## Features
 
 - Player-controlled character with smooth horizontal movement
@@ -36,10 +38,20 @@ You can enable a debug mode during gameplay to visualize collision areas:
 - Unique bubble configurations per level
 - Points awarded by bubble size
 
+## Power-Ups System
+
+The game features a variety of permanent power-ups that can be purchased using points earned in-game. Once purchased, power-ups are always active—some provide automatic benefits, while others can be activated during gameplay via key press. For a full list and strategic guidance, see the in-game Power-Ups Guide.
+
 ## Controls
 
+### Basic Controls
 - **Left/Right Arrow Keys:** Move the player
 - **Spacebar:** Fire a projectile upward
+
+### Power-Up Activation
+- **S Key:** Activate Shield (if purchased)
+- **T Key:** Activate Slow Time (if purchased)
+- **D Key:** Toggle debug mode (development feature)
 
 ## Project Architecture
 

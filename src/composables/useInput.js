@@ -10,7 +10,9 @@ export function useInput() {
     ArrowLeft: false,
     ArrowRight: false,
     Space: false,
-    // Add more keys as needed
+    KeyS: false,
+    KeyT: false,
+    KeyD: false,
   });
 
   // Input buffer for smoother gameplay (future: can expand)
@@ -25,9 +27,20 @@ export function useInput() {
       // Optionally buffer actions here
       inputBuffer.push({ type: 'fire', timestamp: Date.now() });
     }
+    
+    // Power-up activation keys
+    if (e.code === 'KeyS') keysPressed.KeyS = true;
+    if (e.code === 'KeyT') keysPressed.KeyT = true;
+    
+    // Debug mode toggle (KeyD)
+    if (e.code === 'KeyD') {
+      keysPressed.KeyD = true;
+      inputBuffer.push({ type: 'toggleDebug', timestamp: Date.now() });
+    }
+    
     // Prevent scrolling for game keys
     if ([
-      'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'
+      'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyS', 'KeyT', 'KeyD'
     ].includes(e.code)) {
       e.preventDefault();
     }
@@ -37,6 +50,9 @@ export function useInput() {
     if (e.code === 'ArrowLeft') keysPressed.ArrowLeft = false;
     if (e.code === 'ArrowRight') keysPressed.ArrowRight = false;
     if (e.code === 'Space') keysPressed.Space = false;
+    if (e.code === 'KeyS') keysPressed.KeyS = false;
+    if (e.code === 'KeyT') keysPressed.KeyT = false;
+    if (e.code === 'KeyD') keysPressed.KeyD = false;
     e.preventDefault();
   };
 

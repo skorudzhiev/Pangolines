@@ -96,14 +96,14 @@ export function useBubbles(gameWidth, gameHeight) {
     }
   };
   
-  const updateBubbles = () => {
+  const updateBubbles = (timeMultiplier = 1.0) => {
     bubbles.value.forEach(bubble => {
       // Apply gravity to vertical velocity
-      bubble.velocityY += bubble.gravity;
+      bubble.velocityY += bubble.gravity * timeMultiplier;
       
-      // Update bubble position
-      bubble.x += bubble.velocityX;
-      bubble.y += bubble.velocityY;
+      // Update bubble position with time multiplier
+      bubble.x += bubble.velocityX * timeMultiplier;
+      bubble.y += bubble.velocityY * timeMultiplier;
       
       // Bounce off walls
       if (bubble.x - bubble.radius < 0 || bubble.x + bubble.radius > gameWidth) {

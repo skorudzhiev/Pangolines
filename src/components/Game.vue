@@ -1,5 +1,9 @@
 <template>
   <div :class="styles.gameContainer" ref="gameContainer" tabindex="0">
+    <!-- Debug Mode Indicator -->
+    <div v-if="debugIndicator.visible" :style="debugIndicator.style">
+      {{ debugIndicator.text }}
+    </div>
     <div :class="styles.canvasWrapper">
       <GameCanvas
         :gameWidth="gameWidth"
@@ -12,6 +16,7 @@
       <PowerUpIndicator v-if="gameRunning" />
       <MainMenu v-if="!gameRunning && !gameOver.value && !showStore"
         :highScore="highScore"
+        :powerUps="store.powerUps"
         @start-game="startGame"
         @show-store="showStore = true"
       />
@@ -35,6 +40,7 @@
         :classicMode="classicMode"
         :currentLevel="currentLevel"
         :difficulty="difficulty"
+        :timeState="timeState"
         :class="styles.gameUi"
       />
       <PauseScreen
@@ -53,7 +59,7 @@
 <script setup>
 import styles from './Game.module.css';
 import { levelConfigurations } from '../composables/useGameLogic';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import MainMenu from './screens/MainMenu/MainMenu.vue';
 import StoreScreen from './screens/Store/StoreScreen.vue';
 import GameOverScreen from './screens/GameOver/GameOverScreen.vue';
@@ -64,16 +70,19 @@ import GameCanvas from './GameCanvas.vue';
 import { useGameState } from '../composables/useGameState';
 import { useGameLogic } from '../composables/useGameLogic';
 import { useGameEngine } from '../composables/useGameEngine';
-import useAudioManager from '../composables/useAudioManager';
-import { debounce, saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers';
+import { saveToLocalStorage, loadFromLocalStorage } from '../utils/helpers.js';
 import { useParticles } from '../composables/useParticles';
+import { debugMode, processDebugInput, getDebugIndicator, toggleDebugMode, isDebugAvailable } from '../composables/useDebugMode.js';
 import { useComboFloatingText } from '../composables/useComboFloatingText';
+import useAudioManager from '../composables/useAudioManager';
 
 // State
 const {
   gameWidth,
   gameHeight,
   gameContainer,
+  gameCanvas,
+  canvasWrapper,
   showStore,
   gameRunning,
   classicMode,
@@ -84,9 +93,10 @@ const {
   comboTimeoutId,
   difficulty,
   floatingTexts,
-  debugMode,
   store
 } = useGameState();
+
+const debugIndicator = ref(getDebugIndicator());
 
 const gameCanvasRef = ref(null);
 
@@ -106,9 +116,30 @@ watch(showParticles, (val) => {
   saveToLocalStorage('pangShowParticles', val);
 });
 
+// Watch for debug mode changes and update indicator
+watch(debugMode, () => {
+  debugIndicator.value = getDebugIndicator();
+}, { immediate: true });
+
+// --- GLOBAL DEBUG TOGGLE HANDLER ---
+onMounted(() => {
+  const globalDebugKeyHandler = (e) => {
+    if (e.code === 'KeyD') {
+      toggleDebugMode(); // Directly toggle debug mode globally
+    }
+  };
+  window.addEventListener('keydown', globalDebugKeyHandler);
+
+  // Clean up
+  onUnmounted(() => {
+    window.removeEventListener('keydown', globalDebugKeyHandler);
+  });
+});
+
 // Game engine systems (all-in-one)
 const {
   keysPressed,
+  processInput,
   startGameLoop,
   stopGameLoop,
   player,
@@ -129,7 +160,8 @@ const {
   gameOver,
   checkCollisions,
   resetGameState,
-  onBubbleHit
+  onBubbleHit,
+  timeState
 } = useGameEngine(gameWidth, gameHeight);
 
 // Combo floating text system
@@ -159,6 +191,7 @@ const {
   highScore,
   floatingTexts,
   difficulty,
+  timeState,
   resetPlayer,
   resetProjectiles,
   resetBubbles,
@@ -184,6 +217,10 @@ const {
 // Patch updateGame to handle pause between levels in classic mode
 const updateGame = (ctx) => {
   if (!gameRunning.value || showPauseScreen.value) return;
+  
+  // Process debug input
+  processInput();
+  
   originalUpdateGame(ctx);
   // If classic mode and all bubbles cleared, show pause screen
   if (classicMode.value && bubbles.value.length === 0 && !showPauseScreen.value && !gameOver.value) {
@@ -199,16 +236,6 @@ const onNextLevel = () => {
     advanceToNextLevel();
     pendingAdvance = false;
     gameRunning.value = true;
-    // Resume game loop exactly as in startGame
-    startGameLoop(() => {
-      const ctx = gameCanvasRef.value?.gameCanvas?.getContext('2d');
-      if (!ctx) return;
-      updateGame(ctx);
-      if (showParticles.value) {
-        updateParticles();
-        drawParticles(ctx);
-      }
-    });
   }
 };
 
@@ -263,6 +290,19 @@ const startGame = (classic = false) => {
   }
   // Play background music when game starts
   const { playMusic, musicEnabled, stopMusic } = useAudioManager();
+
+  // --- BUGFIX: Ensure at least one bubble is present ---
+  if (bubbles.value.length === 0) {
+    // Try to add a default Medium bubble in the center
+    if (typeof createBubble === 'function') {
+      bubbles.value.push(createBubble(gameWidth / 2, 120, 4));
+      console.warn('[BUGFIX] No bubbles present after game start. Added a fallback Medium bubble. Check your level/bubble configs!');
+    } else {
+      // Fallback: push a minimal bubble object
+      bubbles.value.push({ x: gameWidth / 2, y: 120, radius: 40, color: '#ff7e67', velocityX: 2, velocityY: -6, gravity: 0.02, size: 4, points: 4, minBounceVelocity: 3 });
+      console.warn('[BUGFIX] No bubbles present and createBubble missing. Added a minimal fallback bubble.');
+    }
+  }
   if (musicEnabled.value) {
     playMusic('/sounds/bgm.mp3');
   }
@@ -274,15 +314,6 @@ const startGame = (classic = false) => {
   });
   gameRunning.value = true;
   gameContainer.value.focus();
-  startGameLoop(() => {
-    const ctx = gameCanvasRef.value?.gameCanvas?.getContext('2d');
-    if (!ctx) return;
-    updateGame(ctx);
-    if (showParticles.value) {
-      updateParticles();
-      drawParticles(ctx);
-    }
-  }); // updateGame is now the patched version with pause logic
 
 };
 

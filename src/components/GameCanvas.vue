@@ -74,7 +74,14 @@ onUnmounted(() => {
 
 watch(() => props.gameRunning, (running) => {
   if (running && ctx) {
-    props.onUpdate(ctx);
+    // Start continuous game loop
+    const animate = () => {
+      if (props.gameRunning) {
+        props.onUpdate(ctx);
+        requestAnimationFrame(animate);
+      }
+    };
+    animate();
   }
 });
 

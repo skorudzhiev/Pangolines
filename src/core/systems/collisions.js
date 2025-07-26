@@ -3,6 +3,7 @@ import store from '../../store.js';
 import { bubbleSizes } from '../entities/bubbles.js';
 
 import useAudioManager from '../../composables/useAudioManager';
+import { handleProjectileCollision } from './projectiles.js';
 
 export function useCollisions(player, bubbles, projectiles) {
   // Use store.score as the single source of truth for score
@@ -20,6 +21,7 @@ export function useCollisions(player, bubbles, projectiles) {
   const resetGameState = () => {
     store.score = 0;
     gameOver.value = false;
+    if (store.extraLifeJustUsed !== undefined) store.extraLifeJustUsed = false;
   };
   
   const checkBubblePlayerCollision = (bubble, playerObj) => {
@@ -59,6 +61,11 @@ export function useCollisions(player, bubbles, projectiles) {
       return false;
     }
     
+    // Anchor shots can hit up to 3 bubbles before disappearing
+    if (projectile.anchorShot && projectile.anchorShotHits >= 3) {
+      return false;
+    }
+    
     return true;
   };
   
@@ -66,7 +73,27 @@ export function useCollisions(player, bubbles, projectiles) {
     // Check for collisions between bubbles and player
     for (const bubble of bubbles.value) {
       if (checkBubblePlayerCollision(bubble, player.value)) {
-        gameOver.value = true;
+        // Skip all collision logic if shield is active (player is invincible)
+        if (player.value.shieldActive) {
+          continue; // Skip death logic entirely while shield is active
+        }
+        
+        // Invincibility window after extra life
+        if (typeof performance !== 'undefined' && performance.now() < store.playerInvincibleUntil) {
+          continue; // Skip death logic if invincible
+        }
+        // Check for extra life power-up
+        const extraLife = store.powerUps.find(p => p.id === 'extraLife' && p.isPurchased);
+        if (extraLife) {
+          // Consume extra life and prevent game over
+          extraLife.isPurchased = false;
+          if (store.extraLifeJustUsed !== undefined) store.extraLifeJustUsed = true;
+          if (typeof performance !== 'undefined') store.playerInvincibleUntil = performance.now() + 1200;
+          playSfx && playSfx('/sounds/extra-life.mp3'); // Optional: play sound
+          // Optionally add visual feedback here
+        } else {
+          gameOver.value = true;
+        }
         // We want to continue checking other collisions so the player can still see
         // other bubble hits even if they're going to lose
       }
@@ -80,14 +107,19 @@ export function useCollisions(player, bubbles, projectiles) {
         const bubble = bubbles.value[i];
         
         if (checkBubbleProjectileCollision(bubble, projectile)) {
-           // Remove the projectile
-           projectile.active = false;
+           // Handle projectile collision (including anchorShot logic)
+           handleProjectileCollision(projectile, bubble);
 
            // Play pop SFX
            playSfx('/sounds/pop.mp3');
 
-           const projectileIndex = projectiles.value.indexOf(projectile);
-           projectiles.value.splice(projectileIndex, 1);
+           // Only remove the projectile from the array if it's now inactive
+           if (!projectile.active) {
+             const projectileIndex = projectiles.value.indexOf(projectile);
+             if (projectileIndex !== -1) {
+               projectiles.value.splice(projectileIndex, 1);
+             }
+           }
           
           // Add score - with combo multiplier applied
           const pointsEarned = Math.round(bubble.points * comboMultiplier);

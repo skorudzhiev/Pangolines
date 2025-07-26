@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import store from '../../store.js';
 
 export function usePlayer(gameWidth, gameHeight) {
@@ -8,7 +8,17 @@ export function usePlayer(gameWidth, gameHeight) {
     width: 40,
     height: 60,
     speed: 5,
-    color: '#42b883'
+    color: '#42b883',
+    shieldActive: false,
+    shieldDuration: 0,
+    lives: 3
+  });
+  
+  // Time manipulation state
+  const timeState = ref({
+    slowTimeActive: false,
+    slowTimeDuration: 0,
+    timeMultiplier: 1.0
   });
   
   // Watch for 'Faster Movement' power-up and update speed
@@ -34,13 +44,97 @@ export function usePlayer(gameWidth, gameHeight) {
   // Call reset to initialize player position
   resetPlayer();
   
-  const updatePlayer = (keysPressed) => {
-    // Move player left/right based on keys pressed
+  // Power-up activation functions
+  const activateShield = () => {
+    const hasShield = store.powerUps.find(p => p.id === 'shield' && p.isPurchased);
+    if (hasShield && !player.value.shieldActive) {
+      player.value.shieldActive = true;
+      player.value.shieldDuration = 300; // 5 seconds at 60fps
+      if (hasShield) hasShield.isPurchased = false; // Consume shield
+      if (typeof window !== 'undefined') {
+        const audio = new Audio('/audio/shield_activate.mp3');
+        audio.volume = 0.5;
+        audio.play();
+      }
+    }
+  };
+  
+  const activateSlowTime = () => {
+    const hasSlowTime = store.powerUps.find(p => p.id === 'slowTime' && p.isPurchased);
+    if (hasSlowTime && !timeState.value.slowTimeActive) {
+      timeState.value.slowTimeActive = true;
+      timeState.value.slowTimeDuration = 600; // 10 seconds at 60fps
+      timeState.value.timeMultiplier = 0.5; // Half speed
+    }
+  };
+  
+  const checkExtraLife = () => {
+    const hasExtraLife = store.powerUps.find(p => p.id === 'extraLife' && p.isPurchased);
+    if (hasExtraLife && player.value.lives === 3) {
+      player.value.lives = 4; // Grant extra life
+    }
+  };
+  
+  // Initialize extra life if purchased
+  checkExtraLife();
+
+  // Direct keyboard event listener for power-up activation
+  const handleKeyDown = (e) => {
+    if (e.code === 'KeyS') {
+      activateShield();
+    } else if (e.code === 'KeyT') {
+      activateSlowTime();
+    }
+  };
+
+  // Set up keyboard listener when component mounts
+  onMounted(() => {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+  });
+
+  // Clean up listener when component unmounts
+  onUnmounted(() => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('keydown', handleKeyDown);
+    }
+  });
+  
+  const updatePlayer = (keysPressed, timeMultiplier = 1.0) => {
+    // Update power-up timers
+    if (player.value.shieldActive) {
+      player.value.shieldDuration--;
+      if (player.value.shieldDuration <= 0) {
+        player.value.shieldActive = false;
+        player.value.shieldDuration = 0;
+      }
+    }
+    
+    if (timeState.value.slowTimeActive) {
+      timeState.value.slowTimeDuration--;
+      if (timeState.value.slowTimeDuration <= 0) {
+        timeState.value.slowTimeActive = false;
+        timeState.value.slowTimeDuration = 0;
+        timeState.value.timeMultiplier = 1.0;
+      }
+    }
+    
+    // Check for extra life power-up
+    checkExtraLife();
+    
+    // Move player left/right based on keys pressed with time multiplier
+    const adjustedSpeed = player.value.speed * timeMultiplier;
     if (keysPressed.ArrowLeft) {
-      player.value.x = Math.max(0, player.value.x - player.value.speed);
+      player.value.x = Math.max(0, player.value.x - adjustedSpeed);
     }
     if (keysPressed.ArrowRight) {
-      player.value.x = Math.min(gameWidth - player.value.width, player.value.x + player.value.speed);
+      player.value.x = Math.min(gameWidth - player.value.width, player.value.x + adjustedSpeed);
+    }
+    
+    // Note: Shield activation via S key is handled by direct event listener below
+    if (keysPressed.KeyT) { // T for Time slow
+      activateSlowTime();
     }
   };
   
@@ -184,6 +278,25 @@ export function usePlayer(gameWidth, gameHeight) {
       ctx.stroke();
     }
     ctx.restore();
+    
+    // Draw shield effect if active
+    if (player.value.shieldActive) {
+      ctx.save();
+      const shieldAlpha = Math.sin(Date.now() * 0.01) * 0.3 + 0.7; // Pulsing effect
+      ctx.globalAlpha = shieldAlpha;
+      ctx.strokeStyle = '#00ffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(x + width / 2, y + height / 2, Math.max(width, height) / 1.5, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Inner shield ring
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(x + width / 2, y + height / 2, Math.max(width, height) / 2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     // Debug: draw hitboxes
     if (debugMode) {
@@ -202,8 +315,12 @@ export function usePlayer(gameWidth, gameHeight) {
   
   return {
     player,
+    timeState,
     updatePlayer,
     drawPlayer,
-    resetPlayer
+    resetPlayer,
+    activateShield,
+    activateSlowTime,
+    checkExtraLife
   };
 }
