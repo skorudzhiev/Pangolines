@@ -2,6 +2,8 @@
 
 A modern Vue 3 reinterpretation of the classic arcade game Pang, featuring polished bubble-popping mechanics, responsive controls, retro visuals, and a robust, maintainable architecture.
 
+[Live Demo](https://pangolines.vercel.app/)
+
 ## Features
 
 - Player-controlled character with smooth horizontal movement
@@ -38,48 +40,7 @@ You can enable a debug mode during gameplay to visualize collision areas:
 
 ## Power-Ups System
 
-The game features a comprehensive power-up system with 12 different upgrades that can be purchased using earned points. Power-ups are permanent once purchased and automatically activate their effects during gameplay.
-
-### Movement & Player Enhancements
-
-| Power-Up | Cost | Description | Activation |
-|----------|------|-------------|------------|
-| **Faster Movement** | 300 | Increases player movement speed from 5 to 8 units | Automatic |
-| **Shield** | 800 | Provides 5 seconds of protection from bubbles with pulsing cyan visual effect | Press **S** key |
-| **Extra Life** | 1200 | Grants one additional life (increases from 3 to 4 lives) | Automatic |
-
-### Projectile Enhancements
-
-| Power-Up | Cost | Description | Visual Effect |
-|----------|------|-------------|---------------|
-| **Larger Shots** | 500 | Increases projectile width from 4 to 8 pixels | Standard white |
-| **Double Projectiles** | 600 | Fires two projectiles simultaneously with slight offset | Standard white |
-| **Multi-Shot** | 750 | Fires 3 projectiles in a spread pattern | Yellow color |
-| **Rapid Fire** | 650 | Increases projectile speed and allows up to 3 simultaneous shots | Standard white |
-| **Anchoring Shots** | 850 | Fires an anchor that remains until it is hit by a bubble | Magenta color |
-| **Homing Projectiles** | 1000 | Projectiles automatically seek nearby bubbles within 200px range | Cyan color |
-| **Explosive Projectiles** | 700 | Projectiles explode on impact for area damage | Standard white |
-
-### Special Abilities
-
-| Power-Up | Cost | Description | Activation |
-|----------|------|-------------|------------|
-| **Slow Time** | 900 | Slows down all game elements to 50% speed for 10 seconds | Press **T** key |
-
-### Power-Up Combinations
-
-Power-ups can be combined for enhanced effects:
-- **Multi-Shot + Anchoring**: Each of the 3 projectiles can anchor until hit by a bubble
-- **Homing + Explosive**: Seeking projectiles that explode on impact
-- **Rapid Fire + Larger Shots**: Fast, thick projectiles for maximum coverage
-- **Shield + Slow Time**: Ultimate defensive combination for difficult situations
-
-### Usage Tips
-
-- **Shield** and **Slow Time** are activated manually - save them for challenging moments
-- **Homing Projectiles** work best in crowded bubble scenarios
-- **Anchoring Shots** are most effective as an anchor until hit by a bubble
-- **Multi-Shot** provides excellent coverage for scattered bubbles
+The game features a variety of permanent power-ups that can be purchased using points earned in-game. Once purchased, power-ups are always active—some provide automatic benefits, while others can be activated during gameplay via key press. For a full list and strategic guidance, see the in-game Power-Ups Guide.
 
 ## Controls
 

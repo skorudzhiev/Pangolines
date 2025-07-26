@@ -185,7 +185,7 @@ const powerUpCombinations = [
     powerUps: ['largerShots', 'slowTime'],
     description: 'Perfect for precise shots. Slow time to line up your shots, then use larger projectiles for guaranteed hits.',
     difficulty: 'Beginner',
-    totalCost: 1400
+    totalCost: 1550
   },
   {
     id: 'machineGun',
@@ -193,7 +193,7 @@ const powerUpCombinations = [
     powerUps: ['rapidFire', 'multiShot'],
     description: 'Overwhelming firepower. Rapid fire combined with multi-shot creates a wall of projectiles.',
     difficulty: 'Intermediate',
-    totalCost: 1400
+    totalCost: 1650
   },
   {
     id: 'smartBomber',
@@ -201,7 +201,7 @@ const powerUpCombinations = [
     powerUps: ['homingProjectiles', 'explosiveProjectiles'],
     description: 'Set and forget destruction. Homing projectiles that explode on impact for maximum area damage.',
     difficulty: 'Advanced',
-    totalCost: 1700
+    totalCost: 1600
   },
   {
     id: 'fortress',
@@ -209,7 +209,7 @@ const powerUpCombinations = [
     powerUps: ['shield', 'extraLife', 'slowTime'],
     description: 'Ultimate survival build. Maximum protection with time control for defensive play.',
     difficulty: 'Expert',
-    totalCost: 2900
+    totalCost: 2850
   },
   {
     id: 'speedDemon',
@@ -217,7 +217,7 @@ const powerUpCombinations = [
     powerUps: ['fasterMovement', 'rapidFire', 'doubleProjectiles'],
     description: 'High-mobility offense. Move fast, shoot fast, and overwhelm with projectile count.',
     difficulty: 'Intermediate',
-    totalCost: 1550
+    totalCost: 1750
   },
   {
     id: 'anchorMaster',
@@ -225,7 +225,7 @@ const powerUpCombinations = [
     powerUps: ['anchorShot', 'shield', 'fasterMovement'],
     description: 'Strategic positioning. Use anchors for area control while staying mobile and protected.',
     difficulty: 'Advanced',
-    totalCost: 1950
+    totalCost: 2050
   }
 ];
 
@@ -233,17 +233,17 @@ const strategyTips = [
   {
     id: 'early',
     title: 'Early Game Strategy',
-    content: 'Start with Faster Movement (300 pts) for better positioning, then save for Larger Shots (500 pts) to improve accuracy.'
+    content: 'Start with Faster Movement (250 pts) for better positioning, then save for Larger Shots (600 pts) to improve accuracy.'
   },
   {
     id: 'mid',
     title: 'Mid Game Power Spikes',
-    content: 'Explosive Projectiles (700 pts) or Double Projectiles (600 pts) provide significant damage increases. Choose based on your playstyle.'
+    content: 'Explosive Projectiles (750 pts) or Double Projectiles (650 pts) provide significant damage increases. Choose based on your playstyle.'
   },
   {
     id: 'late',
     title: 'Late Game Dominance',
-    content: 'Homing Projectiles (1000 pts) are game-changing. Combine with any explosive or multi-shot power-up for devastating results.'
+    content: 'Homing Projectiles (850 pts) are game-changing. Combine with any explosive or multi-shot power-up for devastating results.'
   },
   {
     id: 'defensive',
